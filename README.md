@@ -3,4 +3,18 @@
     <br/>Frontend eksempler
 </h1>
 
-Samling gode frontend-løsninger og eksempler basert på NAV sitt frontend-felleskap.
+<div align="center">
+    Samling gode frontend-løsninger og eksempler fra NAV sitt frontend-felleskap.
+</div>
+
+
+## Kontakt
+
+[#frontend](https://nav-it.slack.com/archives/C6HJFRRMY) på slack
+
+
+## Bidrag
+
+<a href="https://github.com/navikt/frontend/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=navikt/frontend" />
+</a>

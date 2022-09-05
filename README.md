@@ -31,6 +31,22 @@ For å kunne kjøre `npm install` lokalt må du logge inn mot Github package reg
 
 - [https://epicreact.dev/](https://epicreact.dev/) Confidently Ship Well-Architected Production Ready React Apps Like a Pro
 
+## TODO
+
+- Deploy av app
+- Amplitude med proxy
+- Wonderwall
+- CMS (komme i gang med Sanity / Enonic)
+- Testing (Cypress / Jest / Testing Library / Axe)
+- Prettier / husky / eslint ++++
+- Sitemap for nav.no
+- Monitorering (frontendlogger / Sentry ++)
+- Tailwind / StyledComponents ++
+- Søk på nav.no
+- Microfrontends / komponenter til MinSide
+- Sikkerhet (lenke til security playbook? Annet?)
+- Performance (bundle analyzer i Nextjs, eventuelt annet)
+
 ## Kontakt
 
 [#frontend](https://nav-it.slack.com/archives/C6HJFRRMY) på slack

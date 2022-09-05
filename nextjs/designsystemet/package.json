@@ -11,7 +11,12 @@
   "dependencies": {
     "next": "12.2.5",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "@navikt/ds-react": "1.2.4",
+    "@navikt/ds-css": "1.2.4",
+    "@navikt/ds-react-internal": "1.2.4",
+    "@navikt/ds-css-internal": "1.2.4",
+    "@navikt/ds-icons": "1.2.4"
   },
   "devDependencies": {
     "@types/node": "18.7.15",

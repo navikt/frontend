@@ -9,6 +9,15 @@
 <br/>
 <br/>
 
+### Github package registry
+
+Vi bruker Github sitt package registry for npm pakker, siden flere av Nav sine pakker kun blir publisert her.
+
+For å kunne kjøre `npm install` lokalt må du logge inn mot Github package registry:
+
+- Lag/forny access token med repo og read:packages rettigheter i github ( under developer settings). Husk enable sso
+- Login på npm med `npm login --scope=@navikt --registry=https://npm.pkg.github.com` og benytt github brukernavn, epost og tokenet du nettopp generert
+
 ## Læring
 
 ### Ressurser

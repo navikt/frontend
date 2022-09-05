@@ -1,4 +1,3 @@
-import "../styles/globals.css";
 import "@navikt/ds-css";
 import "@navikt/ds-css-internal";
 

@@ -9,6 +9,8 @@
 <br/>
 <br/>
 
+## Pakke-publisering
+
 ### Github package registry
 
 Vi bruker Github sitt package registry for npm pakker, siden flere av Nav sine pakker kun blir publisert her.

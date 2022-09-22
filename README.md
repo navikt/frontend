@@ -38,7 +38,7 @@
 
 Vi bruker Github sitt package registry for npm pakker (GPR).
 
-- Flere av Nav sine pakker kun blir publisert her, noe som gjør det vanskelig å bruke to registries samtidig under samme scope `@navikt`.
+- Flere av Nav sine pakker blir kun publisert her, noe som gjør det vanskelig å bruke to registre samtidig under samme scope `@navikt`.
 - Tilgangskontroll blir da styrt av Github-orgen vår vs manuelt for npm.
 
 For å kunne kjøre `npm install` lokalt må du logge inn mot Github package registry:

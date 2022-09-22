@@ -6,4 +6,4 @@ Default tailwind config satt opp i sammenheng med designystemet sin styling og t
 
 ## Designsystem-config
 
-Designsystemet sin taiwlind-config
+Designsystemet sin tailwind-config er basert på token-pakken vår `@navikt/ds-tokens`. Kan lese mer om den her: [Tailwind](https://aksel.nav.no/designsystem/side/tailwind)

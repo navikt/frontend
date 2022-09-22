@@ -1,13 +1,10 @@
 import type { NextPage } from "next";
-import Head from "next/head";
-import Image from "next/image";
-import styles from "../styles/Home.module.css";
 
 const Home: NextPage = () => {
   return (
     <div className="h-screen grid place-items-center text-center">
       <main>
-        <h1 className="text-3xl font-semibold text-deepblue-800">
+        <h1 className="text-3xl font-semibold text-deepblue-800 test2">
           Tailwind demo + designsystem-config
         </h1>
         <a

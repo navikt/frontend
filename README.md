@@ -30,7 +30,8 @@
 
 ### CSS
 
-- [Grid garden](https://cssgridgarden.com/): Interaktiv læring for CSS grid
+- [Flexbox Froggy](https://flexboxfroggy.com/): Interaktiv læring om CSS flexbox
+- [Grid garden](https://cssgridgarden.com/): Interaktiv læring om CSS grid
 
 ## Publisering av NPM pakker
 

@@ -46,11 +46,11 @@ For å installere npm pakker med @navikt-scope trenger du en `.npmrc`-fil med f�
 @navikt:registry=https://npm.pkg.github.com
 ```
 
-Token gerenderer du under [developer settings på Github](https://github.com/settings/tokens). Den trenger kun `read:packages`. Husk å enable SSO for navikt-orgen!
+Token genererer du under [developer settings på Github](https://github.com/settings/tokens). Den trenger kun `read:packages`. Husk å enable SSO for navikt-orgen!
 
 ### Installere pakker i Github workflow
 
-For å slippe å bruke din egen token til å installere pakker fra en Github workflow har vi definert en org-wide token (`READER_TOKEN`) som har `read:packages`.
+For å slippe å bruke din egen token til å installere pakker fra en Github workflow har vi definert en org-wide token `READER_TOKEN`.
 
 I en yml kan det se sånn ut (merk at `registry-url` må defineres for at `NODE_AUTH_TOKEN` skal funke):
 

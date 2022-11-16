@@ -54,24 +54,24 @@ For å slippe å bruke din egen token til å installere pakker fra en Github wor
 
 I en yml kan det se sånn ut (merk at `registry-url` må defineres for at `NODE_AUTH_TOKEN` skal funke):
 
-```
+```yml
 - uses: actions/setup-node@v3
 	with:
-    node-version: 16
-    registry-url: 'https://npm.pkg.github.com'
+		node-version: 16
+		registry-url: 'https://npm.pkg.github.com'
 - run: npm ci
-  env:
-    NODE_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
+	env:
+		NODE_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
 ```
 
 ### Publisere pakker
 
 For å publisere pakker kan man bruke `GITHUB_TOKEN` på denne måten (se npm-publish-workflow for komplett eksempel.yml):
 
-```
+```yml
 - run: npm publish
-  env:
-    NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+	env:
+		NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## TODO

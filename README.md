@@ -66,7 +66,7 @@ Det kan da se sånn ut (merk at `registry-url` må defineres for at `NODE_AUTH_T
 
 ### Publisere pakker
 
-Den enkleste måten å publisere en pakke er å gjøre den i en Github workflow vha. `GITHUB_TOKEN` på denne måten (se komplett eksempel i npm-publish-workflow.yml):
+Den enkleste måten å publisere en pakke er i en Github workflow vha. `GITHUB_TOKEN` på denne måten (se komplett eksempel i npm-publish-workflow.yml):
 
 ```yml
 - run: npm publish

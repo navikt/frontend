@@ -56,9 +56,9 @@ I en yml kan det se sånn ut (merk at `registry-url` må defineres for at `NODE_
 
 ```yml
 - uses: actions/setup-node@v3
-	with:
-		node-version: 16
-		registry-url: 'https://npm.pkg.github.com'
+  with:
+    node-version: 16
+    registry-url: 'https://npm.pkg.github.com'
 - run: npm ci
 	env:
 		NODE_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}

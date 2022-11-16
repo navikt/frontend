@@ -33,25 +33,47 @@
 - [Flexbox Froggy](https://flexboxfroggy.com/): Interaktiv læring om CSS flexbox
 - [Grid garden](https://cssgridgarden.com/): Interaktiv læring om CSS grid
 
-## Publisering av NPM pakker
+## Github npm registry
 
-### Github package registry
+Vi publiserer interne npm-pakker på Github sitt npm registry. Grunnen til det er at tilgangskontroll på npmjs er et herk. Om du allikevel trenger å publisere under navikt-orgen på npmjs kan du ta kontakt med @npm-admins på Slack.
 
-Vi bruker Github sitt package registry for npm pakker (GPR).
+### Installere pakker lokalt
 
-- Flere av Nav sine pakker blir kun publisert her, noe som gjør det vanskelig å bruke to registre samtidig under samme scope `@navikt`.
-- Tilgangskontroll blir da styrt av Github-orgen vår vs manuelt for npm.
-
-For å kunne kjøre `npm install` lokalt må du logge inn mot Github package registry:
-
-- Lag/forny access token med repo og read:packages rettigheter i github (under developer settings). Husk enable SSO!
-- Login på npm med `npm login --scope=@navikt --registry=https://npm.pkg.github.com` og benytt github brukernavn, epost og tokenet du nettopp generert.
-
-Hvis du heller foretrekker en egen `.npmrc`-fil, kan man også legge til auth der:
+For å installere npm pakker med @navikt-scope trenger du en `.npmrc`-fil med følgende:
 
 ```
 //npm.pkg.github.com/:_authToken=TOKEN
 @navikt:registry=https://npm.pkg.github.com
+```
+
+Token genererer du under [developer settings på Github](https://github.com/settings/tokens). Den trenger kun `read:packages`. Husk å enable SSO for navikt-orgen!
+
+### Installere pakker i Github workflow
+
+For å slippe å bruke din egen token til å installere pakker fra en Github workflow har vi definert en org-wide token `READER_TOKEN`.
+
+Dette er da stegene som trengs i workflowen (se komplett eksempel i [npm-publish-workflow.yml](npm-publish-workflow.yml)):
+
+```yml
+- uses: actions/setup-node@v3
+  with:
+    node-version: 16
+    registry-url: "https://npm.pkg.github.com"
+- run: npm ci
+  env:
+    NODE_AUTH_TOKEN: ${{ secrets.READER_TOKEN }}
+```
+
+> :warning: Merk at `registry-url` må defineres for at `NODE_AUTH_TOKEN` skal funke.
+
+### Publisere pakker
+
+Den enkleste måten å publisere en pakke er i en Github workflow vha. `GITHUB_TOKEN` på denne måten (se komplett eksempel i [npm-publish-workflow.yml](npm-publish-workflow.yml)):
+
+```yml
+- run: npm publish
+  env:
+    NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## TODO

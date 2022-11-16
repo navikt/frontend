@@ -52,7 +52,7 @@ Token genererer du under [developer settings på Github](https://github.com/set
 
 For å slippe å bruke din egen token til å installere pakker fra en Github workflow har vi definert en org-wide token `READER_TOKEN`.
 
-I en yml kan det se sånn ut (merk at `registry-url` må defineres for at `NODE_AUTH_TOKEN` skal funke):
+Det kan da se sånn ut (merk at `registry-url` må defineres for at `NODE_AUTH_TOKEN` skal funke):
 
 ```yml
 - uses: actions/setup-node@v3
@@ -66,7 +66,7 @@ I en yml kan det se sånn ut (merk at `registry-url` må defineres for at `NODE_
 
 ### Publisere pakker
 
-For å publisere pakker kan man bruke `GITHUB_TOKEN` på denne måten (se npm-publish-workflow for komplett eksempel.yml):
+Den enkleste måten å publisere en pakke er å gjøre den i en Github workflow vha. `GITHUB_TOKEN` på denne måten (se komplett eksempel i npm-publish-workflow.yml):
 
 ```yml
 - run: npm publish

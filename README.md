@@ -39,7 +39,7 @@ Vi publiserer interne npm-pakker på Github sitt npm registry. Grunnen til det e
 
 ### Installere pakker lokalt
 
-For å installere pakker fra Github lokalt trenger du en `.npmrc`-fil med følgende:
+For å installere npm pakker med @navikt-scope trenger du en `.npmrc`-fil med følgende:
 
 ```
 //npm.pkg.github.com/:_authToken=TOKEN

@@ -5,15 +5,15 @@ import { logger } from "../../utils/logger";
 
 type LogLevels = Exclude<keyof BaseLogger, 'string' | 'level'>;
 
-const levels: LogLevels[] = [
-    "error",
-    "debug",
-    "fatal",
-    "info",
-    "trace",
-    "silent",
-    "warn",
-];
+const levels: Record<LogLevels, LogLevels> = {
+    "error": "error",
+    "debug": "debug",
+    "fatal": "fatal",
+    "info": "info",
+    "trace": "trace",
+    "silent": "silent",
+    "warn": "warn",
+ } as const;
 
 function isValidLoggingLabel(label: unknown): label is LogLevels {
     return typeof label === "string" && label in levels;

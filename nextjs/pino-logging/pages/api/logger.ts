@@ -28,10 +28,8 @@ const loggingHandler = (req: NextApiRequest, res: NextApiResponse): void => {
     const { level, ts }: pino.LogEvent = req.body;
     const label: unknown = level.label;
     if (!isValidLoggingLabel(label)) {
-        res.status(400).json({
-            error: `Invalid label ${label}`,
-        });
-        return
+        res.status(400).json({ error: `Invalid label ${label}` });
+        return;
     }
 
     const messages: [objOrMsg: unknown, msgOrArgs?: string] = req.body.messages;

@@ -16,7 +16,9 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
-    "eject": "react-app-rewired eject"
+    "eject": "react-app-rewired eject",
+    "lint": "eslint \"src/**/*.{js,jsx}\"",
+    "lint:fix": "eslint \"src/**/*.{js,jsx}\" --fix"
   },
   "eslintConfig": {
     "extends": [
@@ -35,5 +37,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint": "^8.28.0"
   }
 }

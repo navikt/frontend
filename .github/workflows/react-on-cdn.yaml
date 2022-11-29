@@ -44,7 +44,7 @@ jobs:
   push-to-cdn:
     runs-on: ubuntu-latest
 
-    needs: build
+    needs: build-app
 
     permissions:
       contents: 'read'

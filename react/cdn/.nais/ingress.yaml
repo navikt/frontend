@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/upstream-vhost: storage.googleapis.com
+    nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/server-snippet: |
+      proxy_intercept_errors on;
+      error_page 404 = /index.html;
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(.*)/$ /frontend-plattform-{{ cdn_env }}-{{ team_name }}/{{ team_name }}/{{ app_name }}/index.html break;
+      rewrite ^/(.*)$ /frontend-plattform-{{ cdn_env }}-{{ team_name }}/{{ team_name }}/{{ app_name }}/$1 break;
+  labels:
+    app: {{ app_name }}
+    team: frontendplattform
+  name: {{ app_name }}
+  namespace: frontendplattform
+spec:
+  ingressClassName: {{ app_ingress_class }}
+  rules:
+  - host: {{ app_ingress }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ app_name }}
+            port:
+              number: 80
+        path: /(.*)
+        pathType: ImplementationSpecific

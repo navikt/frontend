@@ -87,4 +87,4 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: labs-gcp
           RESOURCE: ${{ env.APP_DIR }}/.nais/service.yaml,${{ env.APP_DIR }}/.nais/ingress.yaml
-          #VAR: image=${{ env.docker_image }}
+          VAR: cdn_env=dev,team_name=${{ env.CDN_TEAM }},app_name=${{ env.APP_NAME }},app_ingress=${{ env.APP_NAME}}.labs.nais.io,app_ingress_class=gw-labs-nais-io

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: fp-create-react-app
+    team: frontendplattform
+  name: fp-create-react-app
+  namespace: frontendplattform
+spec:
+  type: ExternalName
+  externalName: storage.googleapis.com
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80

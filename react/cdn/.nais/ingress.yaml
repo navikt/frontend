@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    #nginx.ingress.kubernetes.io/rewrite-target: /frontend-plattform-dev-example/example/create-react-app/$1
+    nginx.ingress.kubernetes.io/upstream-vhost: storage.googleapis.com
+    nginx.ingress.kubernetes.io/from-to-www-redirect: "true"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/server-snippet: |
+      #index /index.html;
+      proxy_intercept_errors on;
+      error_page 404 = /index.html;
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      rewrite ^(.*)/$ /frontend-plattform-dev-example/example/create-react-app/index.html break;
+      rewrite ^/(.*)$ /frontend-plattform-dev-example/example/create-react-app/$1 break;
+  labels:
+    app: fp-create-react-app
+    team: frontendplattform
+  name: fp-create-react-app
+  namespace: frontendplattform
+spec:
+  ingressClassName: gw-labs-nais-io
+  rules:
+  - host: fp-create-react-app.labs.nais.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: fp-create-react-app
+            port:
+              number: 80
+        path: /(.*)
+        pathType: ImplementationSpecific

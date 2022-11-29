@@ -6,7 +6,7 @@ on:
       - '*'
     paths:
       - 'react/cdn/**'
-      - '.github/workflows/create-cdn.yaml'
+      - '.github/workflows/react-on-cdn.yaml'
 
 env:
   APP_NAME: fp-react-cdn

@@ -1,6 +1,38 @@
-# Getting Started with Create React App
+# React on CDN
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app) and is hosted on [Google Cloud Storage](https://cloud.google.com/storage/).
+
+The benefit of serving the application from Google Cloud Storage is that it is a CDN, so the files are cached and served instantly from the nearest location to the user. It is also easy to set up and deploy with no Docker-container or pods running in Kubernetes to serve the application.
+
+```mermaid
+graph LR
+  User --my-app.nav.no--> Ingress
+  User --cdn.nav.no/my-app--> CDN
+
+  subgraph NAIS Cluster
+    Ingress
+    Service
+  end
+
+  subgraph Google Cloud Storage
+    CDN --"js|css|jpg"--> Bucket
+  end
+
+  Ingress --> Service
+  Service --index.html--> Bucket
+```
+
+## Deploying
+
+The application is deployed using GitHub Actions. The workflow is defined in [.github/workflows/react-to-cdn.yaml](.github/workflows/react-to-cdn.yaml).
+
+```mermaid
+graph LR
+  User --push--> GitHub
+  GitHub --> Build
+  Build --push--> CDN
+  Build --deploy--> NAIS
+```
 
 ## Available Scripts
 

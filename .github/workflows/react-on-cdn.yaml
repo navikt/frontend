@@ -67,7 +67,7 @@ jobs:
 
       - id: upload
         name: Upload to CDN
-        uses: navikt/frontend/actions/cdn-upload/v1
+        uses: navikt/frontend/actions/cdn-upload/v1@main
         with:
           cdn-environment: ${{ env.CDN_ENV }}
           cdn-team-name: ${{ env.CDN_TEAM }}

@@ -1,0 +1,111 @@
+name: 'Upload to CDN'
+description: 'Upload static assets to Frontend Plattform CDN'
+inputs:
+  cdn-environment:
+    description: 'CDN environment name (cdn.dev.nav.no or cdn.nav.no)'
+    required: true
+  cdn-team-name:
+    description: 'CDN team name'
+    required: true
+  source:
+    description: 'Source directory'
+    required: true
+  source-keep-parent-name:
+    description: 'Keep parent directory name when uploading'
+    required: false
+    default: 'true'
+  destination:
+    description: 'Destination directory'
+    required: true
+  cache-invalidation:
+    description: 'Cache invalidation'
+    required: false
+    default: 'false'
+  cache-invalidation-background:
+    description: 'Run cache invalidation in the background without waiting'
+    required: false
+    default: 'true'
+
+outputs:
+  uploaded:
+    description: "Uploaded files"
+    value: ${{ steps.upload-file.outputs.uploaded }}
+runs:
+  using: "composite"
+  steps:
+    # Set environment variables for cdn.dev.nav.no
+    - id: 'dev-env'
+      if: ${{ inputs.cdn-environment == 'cdn.dev.nav.no' }}
+      shell: bash
+      run: |
+        echo "Setting environment variables for cdn.dev.nav.no"
+        echo "PROJECT_ID=95282974971" >> $GITHUB_ENV
+        echo "PROJECT_NAME=frontendplattform-dev-2535" >> $GITHUB_ENV
+        echo "LOGICAL_NAME=frontend-plattform-dev" >> $GITHUB_ENV
+        echo "BUCKET_NAME=frontend-plattform-dev-${{ inputs.cdn-team-name }}" >> $GITHUB_ENV
+        echo "SA_NAME=gh-${{ inputs.cdn-team-name }}" >> $GITHUB_ENV
+
+    # Set environment variables for cdn.nav.no
+    - id: 'prod-env'
+      if: ${{ inputs.cdn-environment == 'cdn.nav.no' }}
+      shell: bash
+      run: |
+        echo "Setting environment variables for cdn.nav.no"
+        echo "PROJECT_ID=59294802824" >> $GITHUB_ENV
+        echo "PROJECT_NAME=frontendplattform-prod-55b3" >> $GITHUB_ENV
+        echo "LOGICAL_NAME=frontend-plattform-prod" >> $GITHUB_ENV
+        echo "BUCKET_NAME=frontend-plattform-prod-${{ inputs.cdn-team-name }}" >> $GITHUB_ENV
+        echo "SA_NAME=gh-${{ inputs.cdn-team-name }}" >> $GITHUB_ENV
+
+    # Authenticate with Google Cloud using Workload Identity Federation
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v0'
+      env:
+        GCP_PROJECT_ID: ${{ env.PROJECT_ID }}
+        GCP_SA_EMAIL: gh-${{ inputs.cdn-team-name }}@${{ env.PROJECT_NAME }}.iam.gserviceaccount.com
+      with:
+        workload_identity_provider: 'projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/${{ env.LOGICAL_NAME }}/providers/github-oidc-provider'
+        service_account: '${{ env.SA_NAME }}@${{ env.PROJECT_NAME }}.iam.gserviceaccount.com'
+
+    # Upload files to Google Cloud Storage Bucket connected to CDN
+    - id: 'upload-file'
+      uses: 'google-github-actions/upload-cloud-storage@v0'
+      with:
+        path: '${{ inputs.source }}'
+        parent: '${{ inputs.source-keep-parent-name }}'
+        destination: '${{ env.BUCKET_NAME }}/${{ inputs.cdn-team-name }}/${{ inputs.destination }}'
+
+    # Invalidate cache if cache-invalidation is set to true
+    - name: 'Set up Cloud SDK'
+      if: ${{ inputs.cache-invalidation == 'true' }}
+      uses: 'google-github-actions/setup-gcloud@v1'
+
+    - name: 'Invalidating cache'
+      if: ${{ inputs.cache-invalidation == 'true' }}
+      shell: bash
+      run: |
+        path="/${{ inputs.cdn-team-name }}/${{ inputs.destination }}"
+        path="${path%/}/*"
+
+        async=""
+        if [ "${{ inputs.cache-invalidation-background }}" = "true" ]; then
+          async="--async"
+        fi
+
+        gcloud compute url-maps invalidate-cdn-cache ${{ env.LOGICAL_NAME }} --global $async --path $path
+
+    - if: ${{ inputs.cache-invalidation == 'true' && inputs.cache-invalidation-background == 'true' }}
+      shell: bash
+      run: |
+        path="/${{ inputs.cdn-team-name }}/${{ inputs.destination }}"
+        path="${path%/}/*"
+
+        base_url="https://console.cloud.google.com/net-services/loadbalancing/details/httpAdvanced"
+        console_url="$base_url/${{ env.LOGICAL_NAME }}?project=${{ env.PROJECT_ID }}"
+
+        echo "### CDN Cache Invalidation" >> $GITHUB_STEP_SUMMARY
+        echo "Path: \`$path\`" >> $GITHUB_STEP_SUMMARY
+        echo "Cache invalidation is running in the background. It may take up to `15 minutes` \
+              before the cache is invalidated. You can check the status of the invalidation in \
+              [Google Cloud Console]($console_url) → Caching or set \`cache-invalidation-background\` \
+              to \`false\` in order to wait for the invalidation to complete." >> $GITHUB_STEP_SUMMARY

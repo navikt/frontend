@@ -1,19 +1,25 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import { spaSetupTask, validateInputs } from './spa'
 
-async function run(): Promise<void> {
-  try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+function run() {
+  const teamName: string = core.getInput('team-name')
+  const appName: string = core.getInput('app-name')
+  const source: string = core.getInput('source')
+  const ingress: string = core.getInput('ingress')
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    core.setOutput('time', new Date().toTimeString())
-  } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
+  const err = validateInputs(teamName, appName, ingress)
+  if (err) {
+    core.setFailed(err.message)
+    return
   }
+
+  const { cdnEnv, cdnDest, naisCluster, ingressClass, naisResources, naisVars } = spaSetupTask(teamName, appName, ingress)
+
+  core.setOutput('cdn-environment', cdnEnv)
+  core.setOutput('cdn-destination', cdnDest)
+  core.setOutput('nais-cluster', naisCluster)
+  core.setOutput('nais-resources', naisResources)
+  core.setOutput('nais-vars', naisVars)
 }
 
 run()

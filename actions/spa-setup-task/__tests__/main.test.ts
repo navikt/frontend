@@ -1,29 +1,29 @@
-import {wait} from '../src/wait'
-import * as process from 'process'
-import * as cp from 'child_process'
-import * as path from 'path'
+import * as spa from '../src/spa'
 import {expect, test} from '@jest/globals'
 
-test('throws invalid number', async () => {
-  const input = parseInt('foo', 10)
-  await expect(wait(input)).rejects.toThrow('milliseconds not a number')
+test('splitFirst()', () => {
+  expect(spa.splitFirst('a.b.c', '.')).toEqual(['a', 'b.c'])
+  expect(spa.splitFirst('a.b.c', 'b')).toEqual(['a.', '.c'])
 })
 
-test('wait 500 ms', async () => {
-  const start = new Date()
-  await wait(500)
-  const end = new Date()
-  var delta = Math.abs(end.getTime() - start.getTime())
-  expect(delta).toBeGreaterThan(450)
+test('isValidDomain()', () => {
+  expect(spa.isValidIngress('h/tsdf.no')).toBe(false)
+  expect(spa.isValidIngress('https://nav.no/')).toBe(false)
+  expect(spa.isValidIngress('https://example.com/')).toBe(false)
+  expect(spa.isValidIngress('https://www.nav.no/')).toBe(true)
+  expect(spa.isValidIngress('https://www.nav.no/foobar')).toBe(true)
+  expect(spa.isValidIngress('https://www.dev.nav.no/foobar')).toBe(true)
 })
 
-// shows how the runner will run a javascript action with env / stdout protocol
-test('test runs', () => {
-  process.env['INPUT_MILLISECONDS'] = '500'
-  const np = process.execPath
-  const ip = path.join(__dirname, '..', 'lib', 'main.js')
-  const options: cp.ExecFileSyncOptions = {
-    env: process.env
-  }
-  console.log(cp.execFileSync(np, [ip], options).toString())
+test('isValidAppName()', () => {
+  expect(spa.isValidAppName('')).toBe(false)
+  expect(spa.isValidAppName('a')).toBe(true)
+  expect(spa.isValidAppName('a-')).toBe(false)
+  expect(spa.isValidAppName('a-b')).toBe(true)
+  expect(spa.isValidAppName('a-b-c')).toBe(true)
+  expect(spa.isValidAppName('a-b-c-d')).toBe(true)
+  expect(spa.isValidAppName('a-b-c-d-e')).toBe(true)
+  expect(spa.isValidAppName('a-b-c-d-e-f')).toBe(true)
+  expect(spa.isValidAppName('a-b-c-d-e-f-g')).toBe(true)
+  expect(spa.isValidAppName('a-b-c-d-e-f-g-h')).toBe(true)
 })

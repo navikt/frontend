@@ -13,6 +13,10 @@ inputs:
   ingress:
     description: 'Application ingress URL'
     required: true
+  environment:
+    description: 'Environment name'
+    required: false
+    default: ''
 
 outputs:
   nais-cluster:

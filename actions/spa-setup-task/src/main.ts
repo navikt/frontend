@@ -1,11 +1,12 @@
 import * as core from '@actions/core'
-import { spaSetupTask, validateInputs } from './spa'
+import {spaSetupTask, validateInputs} from './spa'
 
 function run() {
   const teamName: string = core.getInput('team-name')
   const appName: string = core.getInput('app-name')
   const source: string = core.getInput('source')
   const ingress: string = core.getInput('ingress')
+  const environment: string = core.getInput('environment')
 
   const err = validateInputs(teamName, appName, ingress)
   if (err) {
@@ -13,7 +14,12 @@ function run() {
     return
   }
 
-  const { cdnEnv, cdnDest, naisCluster, ingressClass, naisResources, naisVars } = spaSetupTask(teamName, appName, ingress)
+  const {cdnEnv, cdnDest, naisCluster, naisResources, naisVars} = spaSetupTask(
+    teamName,
+    appName,
+    ingress,
+    environment
+  )
 
   core.setOutput('cdn-environment', cdnEnv)
   core.setOutput('cdn-destination', cdnDest)

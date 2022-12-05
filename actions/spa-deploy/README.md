@@ -34,13 +34,12 @@ jobs:
   - run: npm run build
   - run: npm run package
   - run: npm run package
-  - name: Deploy SPA
+  - name: Deploy
     uses: navikt/frontend/actions/spa-deploy/v1@main
     with:
       app-name: myapp
       team-name: myteam
       source: ./build
-      env: prod
       ingress: myapp.nav.no/myapp
       nais-deploy-key: ${{ secrets.NAIS_DEPLOY_KEY }}
 ```
@@ -52,6 +51,12 @@ jobs:
 | `app-name` | Name of the application | Yes | |
 | `team-name` | Name of the team | Yes | |
 | `source` | Path to the directory containing the SPA | Yes | |
-| `env` | Environment to deploy to | Yes | |
+| `environment` | Application environment (`dev`, `prod`, etc.) | Yes | |
 | `ingress` | Ingress to use for the application | Yes | |
 | `nais-deploy-key` | NAIS Deploy Key | Yes | |
+
+Static files will be uploaded to the following path in NAV CDN:
+
+```text
+https://cdn.nav.no/<team-name>/<app-name>/<env>/
+```

@@ -10,6 +10,9 @@ inputs:
   source:
     description: 'Application source directory'
     required: true
+  environment:
+    description: 'Environment name'
+    required: true
   ingress:
     description: 'Application ingress URL'
     required: true
@@ -30,6 +33,7 @@ runs:
         app-name: ${{ inputs.app-name }}
         ingress: ${{ inputs.ingress }}
         source: ${{ inputs.source }}
+        environment: ${{ inputs.environment }}
 
     - id: cdn-upload
       name: Upload SPA to CDN

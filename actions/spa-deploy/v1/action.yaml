@@ -16,6 +16,9 @@ inputs:
   ingress:
     description: 'Application ingress URL'
     required: true
+  nais-deploy-apikey:
+    description: 'NAIS deploy API key'
+    required: true
 
 outputs:
   url:
@@ -49,7 +52,7 @@ runs:
       name: Deploy SPA to NAIS
       uses: nais/deploy/actions/deploy@v1
       env:
-        APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+        APIKEY: ${{ inputs.nais-deploy-apikey }}
         CLUSTER: ${{ steps.setup.outputs.nais-cluster }}
         RESOURCE: ${{ steps.setup.outputs.nais-resource }}
         VAR: ${{ steps.setup.outputs.nais-var }}

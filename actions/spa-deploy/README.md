@@ -41,7 +41,7 @@ jobs:
       team-name: myteam
       source: ./build
       ingress: myapp.nav.no/myapp
-      nais-deploy-key: ${{ secrets.NAIS_DEPLOY_KEY }}
+      nais-deploy-apikey: ${{ secrets.NAIS_DEPLOY_APIKEY }}
 ```
 
 ## Inputs

@@ -96,7 +96,7 @@ export function cdnPathForApp(
   env: string,
   bucketPrefix: string
 ): string {
-  return `${bucketPrefix}${team}/${team}/${cdnDestForApp(app, env)}`
+  return `/${bucketPrefix}${team}/${team}/${cdnDestForApp(app, env)}`
 }
 
 export function cdnDestForApp(app: string, env: string): string {

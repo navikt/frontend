@@ -2940,7 +2940,7 @@ function parseIngress(ingressHost) {
 }
 exports.parseIngress = parseIngress;
 function cdnPathForApp(team, app, env, bucketPrefix) {
-    return `${bucketPrefix}${team}/${team}/${cdnDestForApp(app, env)}`;
+    return `/${bucketPrefix}${team}/${team}/${cdnDestForApp(app, env)}`;
 }
 exports.cdnPathForApp = cdnPathForApp;
 function cdnDestForApp(app, env) {

@@ -45,7 +45,7 @@ test('parseIngress()', () => {
 
 test('cdnPathForApp()', () => {
   expect(spa.cdnPathForApp('myteam', 'myapp', 'dev', 'bucket-prefix-')).toBe(
-    'bucket-prefix-myteam/myteam/myapp/dev'
+    '/bucket-prefix-myteam/myteam/myapp/dev'
   )
 })
 

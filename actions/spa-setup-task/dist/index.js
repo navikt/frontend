@@ -2840,7 +2840,7 @@ function run() {
     const { cdnHost, cdnDest, naisCluster, naisResources, naisVars } = (0, spa_1.spaSetupTask)(teamName, appName, ingress, environment);
     core.setOutput('cdn-environment', cdnHost);
     core.setOutput('cdn-destination', cdnDest);
-    core.setOutput('cdn-team', teamName);
+    core.setOutput('cdn-team-name', teamName);
     core.setOutput('nais-cluster', naisCluster);
     core.setOutput('nais-resources', naisResources);
     core.setOutput('nais-vars', naisVars);

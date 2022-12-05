@@ -21,8 +21,16 @@ inputs:
 outputs:
   nais-cluster:
     description: 'NAIS cluster name'
-  app-url:
-    description: "Application URL"
+  nais-resources:
+    description: 'NAIS resources files'
+  nais-vars:
+    description: 'NAIS variables'
+  cdn-environment:
+    description: 'CDN environment name'
+  cdn-team-name:
+    description: 'CDN team name'
+  cdn-destination:
+    description: 'CDN destination'
 
 runs:
   using: 'node16'

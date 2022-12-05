@@ -23,6 +23,7 @@ function run(): void {
 
   core.setOutput('cdn-environment', cdnHost)
   core.setOutput('cdn-destination', cdnDest)
+  core.setOutput('cdn-team', teamName)
   core.setOutput('nais-cluster', naisCluster)
   core.setOutput('nais-resources', naisResources)
   core.setOutput('nais-vars', naisVars)

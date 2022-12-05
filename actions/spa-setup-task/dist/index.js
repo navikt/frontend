@@ -2763,7 +2763,7 @@ function ingressForApp(team, app, env, ingressHost, ingressPath, ingressClass, b
                             pathType: 'ImplementationSpecific',
                             backend: {
                                 service: {
-                                    name: app,
+                                    name,
                                     port: {
                                         number: 80
                                     }

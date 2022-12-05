@@ -2938,6 +2938,7 @@ function naisResourcesForApp(team, app, ingressHost, ingressPath, bucketPath, bu
     const serviceResource = (0, k8s_1.serviceForApp)(team, app, bucketVhost);
     const ingressFilePath = `${tmpDir}/${team}-${app}-ingress.yaml`;
     const serviceFilePath = `${tmpDir}/${team}-${app}-service.yaml`;
+    (0, fs_1.mkdirSync)(tmpDir, { recursive: true });
     (0, fs_1.writeFileSync)(ingressFilePath, String(ingressResource));
     (0, fs_1.writeFileSync)(serviceFilePath, String(serviceResource));
     return [ingressFilePath, serviceFilePath].join(',');

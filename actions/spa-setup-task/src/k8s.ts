@@ -46,8 +46,8 @@ export function serviceForApp(
       name: app,
       namespace: team,
       labels: {
-        app: app,
-        team: team
+        app,
+        team
       }
     },
     spec: serviceSpec
@@ -104,9 +104,9 @@ export function ingressForApp(
       name: app,
       namespace: team,
       labels: {
-        app: app
+        app
       },
-      annotations: annotations
+      annotations
     },
     spec: ingressSpec
   }

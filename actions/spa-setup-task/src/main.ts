@@ -1,10 +1,10 @@
 import * as core from '@actions/core'
 import {spaSetupTask, validateInputs} from './spa'
 
-function run() {
+function run(): void {
   const teamName: string = core.getInput('team-name')
   const appName: string = core.getInput('app-name')
-  const source: string = core.getInput('source')
+  // const source: string = core.getInput('source')
   const ingress: string = core.getInput('ingress')
   const environment: string = core.getInput('environment')
 

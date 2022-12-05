@@ -15,7 +15,7 @@ type Clusters = {
   [key: string]: NaisCluster
 }
 
-const bucketVhost = 'storage.googleapis.com'
+const defaultBucketVhost = 'storage.googleapis.com'
 
 type NaisCluster = {
   naisCluster: string
@@ -63,6 +63,7 @@ export function splitFirst(s: string, sep: string): [string, string] {
 }
 
 export function domainForHost(host: string): string {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, domain] = splitFirst(host, '.')
 
   return domain
@@ -172,7 +173,7 @@ export function spaSetupTask(
     ingressHost,
     ingressPath,
     bucketPath,
-    bucketVhost,
+    defaultBucketVhost,
     ingressClass
   )
   const naisVars = ''

@@ -32,15 +32,14 @@ jobs:
       node-version: '16'
   - run: npm ci
   - run: npm run build
-  - run: npm run package
-  - run: npm run package
   - name: Deploy
     uses: navikt/frontend/actions/spa-deploy/v1@main
     with:
       app-name: myapp
       team-name: myteam
       source: ./build
-      ingress: myapp.nav.no/myapp
+      ingress: https://foo.nav.no/bar
+      environment: baz
       nais-deploy-apikey: ${{ secrets.NAIS_DEPLOY_APIKEY }}
 ```
 
@@ -51,7 +50,7 @@ jobs:
 | `app-name` | Name of the application | Yes | |
 | `team-name` | Name of the team | Yes | |
 | `source` | Path to the directory containing the SPA | Yes | |
-| `environment` | Application environment (`dev`, `prod`, etc.) | Yes | |
+| `environment` | Application environment (any string) | Yes | |
 | `ingress` | Ingress to use for the application | Yes | |
 | `nais-deploy-key` | NAIS Deploy Key | Yes | |
 

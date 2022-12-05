@@ -30,10 +30,10 @@ jobs:
         working-directory: actions/${{ matrix.action }}
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v3.5.1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: '16'
       - run: yarn install
       - run: yarn build
       - run: yarn package

@@ -31,19 +31,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Set Node.js 16.x
-        uses: actions/setup-node@v3.5.1
+      - uses: actions/setup-node@v3.5.1
         with:
           node-version: 16.x
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Rebuild the dist/ directory
-        run: |
-          npm run build
-          npm run package
+      - run: yarn install
+      - run: yarn build
+      - run: yarn package
 
       - name: Compare the expected and actual dist/ directories
         run: |

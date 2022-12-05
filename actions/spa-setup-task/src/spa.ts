@@ -1,4 +1,4 @@
-import {writeFileSync} from 'fs'
+import {mkdirSync, writeFileSync} from 'fs'
 import {ingressForApp, serviceForApp} from './k8s'
 
 enum CDNEnv {
@@ -123,6 +123,7 @@ export function naisResourcesForApp(
   const ingressFilePath = `${tmpDir}/${team}-${app}-ingress.yaml`
   const serviceFilePath = `${tmpDir}/${team}-${app}-service.yaml`
 
+  mkdirSync(tmpDir, {recursive: true})
   writeFileSync(ingressFilePath, String(ingressResource))
   writeFileSync(serviceFilePath, String(serviceResource))
 

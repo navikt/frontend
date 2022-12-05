@@ -21,8 +21,8 @@ inputs:
 outputs:
   nais-cluster:
     description: 'NAIS cluster name'
-  nais-resources:
-    description: 'NAIS resources files'
+  nais-resource:
+    description: 'NAIS resource files'
   nais-vars:
     description: 'NAIS variables'
   cdn-environment:

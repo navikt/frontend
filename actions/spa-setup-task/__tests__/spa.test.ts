@@ -1,3 +1,4 @@
+import YAML from 'yaml'
 import * as spa from '../src/spa'
 import {expect, test, beforeAll, afterAll} from '@jest/globals'
 import {existsSync, mkdirSync, readFileSync, rmSync} from 'fs'
@@ -66,6 +67,7 @@ test('naisResourcesForApp()', () => {
     .naisResourcesForApp(
       'myteam',
       'myapp',
+      'myenv',
       'www.nav.no',
       '/myapp',
       'bucket/path',
@@ -76,10 +78,19 @@ test('naisResourcesForApp()', () => {
     .split(',')
 
   expect(resources).toHaveLength(2)
-  expect(resources[0]).toContain('ingress.yaml')
-  expect(resources[1]).toContain('service.yaml')
-  resources.forEach(resource => {
-    expect(existsSync(resource)).toBe(true)
-    expect(readFileSync(resource, 'utf8')).toContain('apiVersion')
-  })
+  const [ingress, service] = resources
+
+  expect(ingress).toContain('ingress.yaml')
+  expect(service).toContain('service.yaml')
+
+  const ingressYaml = YAML.parse(readFileSync(ingress, 'utf-8'))
+  const serviceYaml = YAML.parse(readFileSync(service, 'utf-8'))
+
+  expect(ingressYaml.kind).toEqual('Ingress')
+  expect(serviceYaml.kind).toEqual('Service')
+
+  expect(ingressYaml.spec.rules[0].host).toEqual('www.nav.no')
+  expect(ingressYaml.spec.rules[0].http.paths[0].backend.service.name).toEqual(
+    serviceYaml.metadata.name
+  )
 })

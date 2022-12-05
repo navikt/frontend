@@ -88,7 +88,7 @@ export function ingressForApp(
               pathType: 'ImplementationSpecific',
               backend: {
                 service: {
-                  name: app,
+                  name,
                   port: {
                     number: 80
                   }

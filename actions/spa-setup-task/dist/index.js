@@ -2952,7 +2952,7 @@ function validateInputs(team, app, ingress) {
         return Error(`Invalid app name: ${app}. App name must match regex: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$`);
     }
     if (!isValidIngress(ingress)) {
-        return Error(`Invalid ingress: ${ingress}. Ingress must be a valid URL with a valid domain`);
+        return Error(`Invalid ingress: ${ingress}. Ingress must be a valid URL with a known domain on format https://<host>/<path>`);
     }
     return null;
 }

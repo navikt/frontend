@@ -1,6 +1,6 @@
 import * as spa from '../src/spa'
 import {expect, test, beforeAll, afterAll} from '@jest/globals'
-import {existsSync, mkdirSync, rmSync} from 'fs'
+import {existsSync, mkdirSync, readFileSync, rmSync} from 'fs'
 
 const tmpDir = './tmp'
 
@@ -80,5 +80,6 @@ test('naisResourcesForApp()', () => {
   expect(resources[1]).toContain('service.yaml')
   resources.forEach(resource => {
     expect(existsSync(resource)).toBe(true)
+    expect(readFileSync(resource, 'utf8')).toContain('apiVersion')
   })
 })

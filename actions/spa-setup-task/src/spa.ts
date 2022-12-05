@@ -1,3 +1,4 @@
+import YAML from 'yaml'
 import {mkdirSync, writeFileSync} from 'fs'
 import {ingressForApp, serviceForApp} from './k8s'
 
@@ -126,8 +127,8 @@ export function naisResourcesForApp(
   const serviceFilePath = `${tmpDir}/${team}-${app}-${env}-service.yaml`
 
   mkdirSync(tmpDir, {recursive: true})
-  writeFileSync(ingressFilePath, String(ingressResource))
-  writeFileSync(serviceFilePath, String(serviceResource))
+  writeFileSync(ingressFilePath, YAML.stringify(ingressResource))
+  writeFileSync(serviceFilePath, YAML.stringify(serviceResource))
 
   return [ingressFilePath, serviceFilePath].join(',')
 }

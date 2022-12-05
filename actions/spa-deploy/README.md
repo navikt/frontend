@@ -26,10 +26,10 @@ on:
       - main
 
 jobs:
-  - uses: actions/checkout@v2
-  - uses: actions/setup-node@v2
+  - uses: actions/checkout@v3
+  - uses: actions/setup-node@v3
     with:
-      node-version: '14'
+      node-version: '16'
   - run: npm ci
   - run: npm run build
   - run: npm run package

@@ -2842,7 +2842,7 @@ function run() {
     core.setOutput('cdn-destination', cdnDest);
     core.setOutput('cdn-team-name', teamName);
     core.setOutput('nais-cluster', naisCluster);
-    core.setOutput('nais-resources', naisResources);
+    core.setOutput('nais-resource', naisResources);
     core.setOutput('nais-vars', naisVars);
 }
 run();

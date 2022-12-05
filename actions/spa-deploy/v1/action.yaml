@@ -43,7 +43,7 @@ runs:
       uses: ./actions/cdn-upload/v1
       with:
         cdn-environment: ${{ steps.setup.outputs.cdn-environment }}
-        cdn-team-name: ${{ steps.setup.outputs.cdn-team-name }}
+        cdn-team-name: ${{ inputs.team-name }}
         source: ${{ inputs.source }}
         source-keep-parent-name: false
         destination: ${{ steps.setup.outputs.cdn-destination }}
@@ -56,3 +56,4 @@ runs:
         CLUSTER: ${{ steps.setup.outputs.nais-cluster }}
         RESOURCE: ${{ steps.setup.outputs.nais-resource }}
         VAR: ${{ steps.setup.outputs.nais-var }}
+        TEAM: ${{ inputs.team-name }}

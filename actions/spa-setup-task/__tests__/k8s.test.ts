@@ -32,7 +32,7 @@ test('serviceForApp()', () => {
 
   const service = k8s.serviceForApp(team, app, env, bucketVhost)
 
-  expect(service?.metadata?.name).toBe(app)
+  expect(service?.metadata?.name).toBe(`${app}-${env}`)
   expect(service?.metadata?.namespace).toBe(team)
   expect(service?.metadata?.labels?.app).toBe(app)
   expect(service?.metadata?.labels?.team).toBe(team)
@@ -69,7 +69,7 @@ test('ingressForApp()', () => {
     bucketVhost
   )
 
-  expect(ingress?.metadata?.name).toBe(app)
+  expect(ingress?.metadata?.name).toBe(`${app}-${env}`)
   expect(ingress?.metadata?.namespace).toBe(team)
   expect(ingress?.metadata?.labels?.app).toBe(app)
   expect(ingress?.metadata?.labels?.team).toBe(team)

@@ -27,6 +27,7 @@ export function serviceForApp(
   env: string,
   bucketVhost: string
 ): k8s.V1Service {
+  const name = `${app}-${env}`
   const serviceSpec: k8s.V1ServiceSpec = {
     type: 'ExternalName',
     externalName: bucketVhost,
@@ -44,7 +45,7 @@ export function serviceForApp(
     apiVersion: 'v1',
     kind: 'Service',
     metadata: {
-      name: app,
+      name,
       namespace: team,
       labels: {
         app,
@@ -71,6 +72,7 @@ export function ingressForApp(
   bucketPath: string,
   bucketVhost: string
 ): k8s.V1Ingress {
+  const name = `${app}-${env}`
   const host = ingressHost
   const path = parsePath(ingressPath)
   const annotations = ingressAnnotations(bucketPath, bucketVhost)
@@ -104,7 +106,7 @@ export function ingressForApp(
     apiVersion: 'networking.k8s.io/v1',
     kind: 'Ingress',
     metadata: {
-      name: app,
+      name,
       namespace: team,
       labels: {
         app,

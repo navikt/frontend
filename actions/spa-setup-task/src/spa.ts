@@ -112,7 +112,7 @@ export function naisResourcesForApp(
 ): string {
   const ingressResource = ingressForApp(
     team,
-    `${app}-${env}`,
+    app,
     env,
     ingressHost,
     ingressPath,

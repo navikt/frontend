@@ -2713,6 +2713,7 @@ function trimRight(s, char) {
 }
 exports.trimRight = trimRight;
 function serviceForApp(team, app, env, bucketVhost) {
+    const name = `${app}-${env}`;
     const serviceSpec = {
         type: 'ExternalName',
         externalName: bucketVhost,
@@ -2729,7 +2730,7 @@ function serviceForApp(team, app, env, bucketVhost) {
         apiVersion: 'v1',
         kind: 'Service',
         metadata: {
-            name: app,
+            name,
             namespace: team,
             labels: {
                 app,
@@ -2747,6 +2748,7 @@ function parsePath(path) {
 }
 exports.parsePath = parsePath;
 function ingressForApp(team, app, env, ingressHost, ingressPath, ingressClass, bucketPath, bucketVhost) {
+    const name = `${app}-${env}`;
     const host = ingressHost;
     const path = parsePath(ingressPath);
     const annotations = ingressAnnotations(bucketPath, bucketVhost);
@@ -2778,7 +2780,7 @@ function ingressForApp(team, app, env, ingressHost, ingressPath, ingressClass, b
         apiVersion: 'networking.k8s.io/v1',
         kind: 'Ingress',
         metadata: {
-            name: app,
+            name,
             namespace: team,
             labels: {
                 app,
@@ -2942,7 +2944,7 @@ function cdnPathForApp(team, app, env, bucketPrefix) {
 }
 exports.cdnPathForApp = cdnPathForApp;
 function naisResourcesForApp(team, app, env, ingressHost, ingressPath, bucketPath, bucketVhost, ingressClass, tmpDir = './tmp') {
-    const ingressResource = (0, k8s_1.ingressForApp)(team, `${app}-${env}`, env, ingressHost, ingressPath, ingressClass, bucketPath, bucketVhost);
+    const ingressResource = (0, k8s_1.ingressForApp)(team, app, env, ingressHost, ingressPath, ingressClass, bucketPath, bucketVhost);
     const serviceResource = (0, k8s_1.serviceForApp)(team, app, env, bucketVhost);
     const ingressFilePath = `${tmpDir}/${team}-${app}-${env}-ingress.yaml`;
     const serviceFilePath = `${tmpDir}/${team}-${app}-${env}-service.yaml`;

@@ -30,7 +30,7 @@ runs:
   steps:
     - id: setup
       name: Setup for SPA deploy
-      uses: ../../spa-setup-task
+      uses: ./actions/spa-setup-task
       with:
         team-name: ${{ inputs.team-name }}
         app-name: ${{ inputs.app-name }}
@@ -40,7 +40,7 @@ runs:
 
     - id: cdn-upload
       name: Upload SPA to CDN
-      uses: ../../cdn-upload/v1
+      uses: ./actions/cdn-upload/v1
       with:
         cdn-environment: ${{ steps.setup.outputs.cdn-environment }}
         cdn-team-name: ${{ steps.setup.outputs.cdn-team-name }}

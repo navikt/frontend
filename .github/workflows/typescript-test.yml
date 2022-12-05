@@ -6,7 +6,7 @@ on: # rebuild any PRs and main branch changes
       - main
 
 jobs:
-  build: # make sure build/ci work properly
+  build:
     runs-on: ubuntu-latest
 
     strategy:
@@ -28,8 +28,14 @@ jobs:
 
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        action:
+          - spa-setup-task
+
     steps:
       - uses: actions/checkout@v2
-      - uses: ./
+      - uses: ./actions/${{ matrix.action }}
         with:
           milliseconds: 1000

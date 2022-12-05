@@ -96,7 +96,11 @@ export function cdnPathForApp(
   env: string,
   bucketPrefix: string
 ): string {
-  return `${bucketPrefix}${team}/${team}/${app}/${env}`
+  return `${bucketPrefix}${team}/${team}/${cdnDestForApp(app, env)}`
+}
+
+export function cdnDestForApp(app: string, env: string): string {
+  return `${app}/${env}`
 }
 
 export function naisResourcesForApp(
@@ -163,7 +167,6 @@ export function spaSetupTask(
   cdnDest: string
   naisCluster: string
   naisResources: string
-  naisVars: string
 } {
   const {hostname: ingressHost, pathname: ingressPath} = new URL(ingress)
 
@@ -171,6 +174,7 @@ export function spaSetupTask(
     parseIngress(ingressHost)
   env = env || naisCluster
   const bucketPath = cdnPathForApp(team, app, env, cdnBucketPrefix)
+  const cdnDest = cdnDestForApp(app, env)
   const naisResources = naisResourcesForApp(
     team,
     app,
@@ -181,12 +185,10 @@ export function spaSetupTask(
     defaultBucketVhost,
     ingressClass
   )
-  const naisVars = ''
   return {
     cdnHost,
-    cdnDest: bucketPath,
+    cdnDest,
     naisCluster,
-    naisResources,
-    naisVars
+    naisResources
   }
 }

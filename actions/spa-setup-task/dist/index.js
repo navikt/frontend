@@ -2839,13 +2839,13 @@ function run() {
         core.setFailed(err.message);
         return;
     }
-    const { cdnHost, cdnDest, naisCluster, naisResources, naisVars } = (0, spa_1.spaSetupTask)(teamName, appName, ingress, environment);
+    const { cdnHost, cdnDest, naisCluster, naisResources } = (0, spa_1.spaSetupTask)(teamName, appName, ingress, environment);
     core.setOutput('cdn-environment', cdnHost);
     core.setOutput('cdn-destination', cdnDest);
     core.setOutput('cdn-team-name', teamName);
     core.setOutput('nais-cluster', naisCluster);
     core.setOutput('nais-resource', naisResources);
-    core.setOutput('nais-vars', naisVars);
+    core.setOutput('nais-vars', '');
 }
 run();
 
@@ -2861,7 +2861,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.spaSetupTask = exports.validateInputs = exports.naisResourcesForApp = exports.cdnPathForApp = exports.parseIngress = exports.isValidAppName = exports.isValidIngress = exports.domainForHost = exports.splitFirst = void 0;
+exports.spaSetupTask = exports.validateInputs = exports.naisResourcesForApp = exports.cdnDestForApp = exports.cdnPathForApp = exports.parseIngress = exports.isValidAppName = exports.isValidIngress = exports.domainForHost = exports.splitFirst = void 0;
 const yaml_1 = __importDefault(__nccwpck_require__(4083));
 const fs_1 = __nccwpck_require__(7147);
 const k8s_1 = __nccwpck_require__(130);
@@ -2940,9 +2940,13 @@ function parseIngress(ingressHost) {
 }
 exports.parseIngress = parseIngress;
 function cdnPathForApp(team, app, env, bucketPrefix) {
-    return `${bucketPrefix}${team}/${team}/${app}/${env}`;
+    return `${bucketPrefix}${team}/${team}/${cdnDestForApp(app, env)}`;
 }
 exports.cdnPathForApp = cdnPathForApp;
+function cdnDestForApp(app, env) {
+    return `${app}/${env}`;
+}
+exports.cdnDestForApp = cdnDestForApp;
 function naisResourcesForApp(team, app, env, ingressHost, ingressPath, bucketPath, bucketVhost, ingressClass, tmpDir = './tmp') {
     const ingressResource = (0, k8s_1.ingressForApp)(team, app, env, ingressHost, ingressPath, ingressClass, bucketPath, bucketVhost);
     const serviceResource = (0, k8s_1.serviceForApp)(team, app, env, bucketVhost);
@@ -2969,14 +2973,13 @@ function spaSetupTask(team, app, ingress, env = '') {
     const { naisCluster, ingressClass, cdnHost, cdnBucketPrefix } = parseIngress(ingressHost);
     env = env || naisCluster;
     const bucketPath = cdnPathForApp(team, app, env, cdnBucketPrefix);
+    const cdnDest = cdnDestForApp(app, env);
     const naisResources = naisResourcesForApp(team, app, env, ingressHost, ingressPath, bucketPath, defaultBucketVhost, ingressClass);
-    const naisVars = '';
     return {
         cdnHost,
-        cdnDest: bucketPath,
+        cdnDest,
         naisCluster,
-        naisResources,
-        naisVars
+        naisResources
     };
 }
 exports.spaSetupTask = spaSetupTask;

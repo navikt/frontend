@@ -17,7 +17,7 @@ env:
   APP_DIR: react/cdn
   APP_BUILD: react/cdn/build
   APP_ENV: labs
-  APP_INGRESS: fp-react-cdn.labs.nais.io
+  APP_INGRESS: https://fp-react-cdn.labs.nais.io/
   TEAM_NAME: frontendplattform
 
 jobs:

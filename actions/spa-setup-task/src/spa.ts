@@ -145,7 +145,7 @@ export function validateInputs(
 
   if (!isValidIngress(ingress)) {
     return Error(
-      `Invalid ingress: ${ingress}. Ingress must be a valid URL with a valid domain`
+      `Invalid ingress: ${ingress}. Ingress must be a valid URL with a known domain on format https://<host>/<path>`
     )
   }
 

@@ -1,9 +1,15 @@
-name: 'typescript-build-test'
-on: # rebuild any PRs and main branch changes
+name: 'Typescript Actions'
+on:
   pull_request:
+    paths:
+      - .github/workflows/typescript.yml
+      - actions/spa-setup-task/**
   push:
     branches:
       - main
+    paths:
+      - .github/workflows/typescript.yml
+      - actions/spa-setup-task/**
 
 jobs:
   build:
@@ -29,13 +35,12 @@ jobs:
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        action:
-          - spa-setup-task
-
     steps:
       - uses: actions/checkout@v2
-      - uses: ./actions/${{ matrix.action }}
+      - uses: ./actions/spa-setup-task
         with:
-          milliseconds: 1000
+          team-name: 'team'
+          app-name: 'app'
+          source: 'src'
+          ingress: 'https://app.dev.intern.nav.no'
+          environment: 'dev'

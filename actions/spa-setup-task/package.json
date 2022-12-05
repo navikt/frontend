@@ -1,5 +1,5 @@
 {
-  "name": "spa-ingress-action",
+  "name": "spa-setup-action",
   "version": "1.0.0",
   "main": "src/main.ts",
   "repository": "https://github.com/navikt/frontend.git",

@@ -24,6 +24,7 @@ export function trimRight(s: string, char: string): string {
 export function serviceForApp(
   team: string,
   app: string,
+  env: string,
   bucketVhost: string
 ): k8s.V1Service {
   const serviceSpec: k8s.V1ServiceSpec = {
@@ -47,7 +48,8 @@ export function serviceForApp(
       namespace: team,
       labels: {
         app,
-        team
+        team,
+        env
       }
     },
     spec: serviceSpec
@@ -62,6 +64,7 @@ export function parsePath(path: string): string {
 export function ingressForApp(
   team: string,
   app: string,
+  env: string,
   ingressHost: string,
   ingressPath: string,
   ingressClass: string,
@@ -104,7 +107,9 @@ export function ingressForApp(
       name: app,
       namespace: team,
       labels: {
-        app
+        app,
+        team,
+        env
       },
       annotations
     },

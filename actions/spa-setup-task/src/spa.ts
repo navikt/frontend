@@ -20,7 +20,7 @@ const defaultBucketVhost = 'storage.googleapis.com'
 type NaisCluster = {
   naisCluster: string
   ingressClass: string
-  cdnEnv: string
+  cdnHost: string
   cdnBucketPrefix: string
 }
 
@@ -28,31 +28,31 @@ const hostMap: Clusters = {
   'nav.no': {
     naisCluster: 'prod-gcp',
     ingressClass: 'gw-nav-no',
-    cdnEnv: CDNEnv.prod,
+    cdnHost: CDNEnv.prod,
     cdnBucketPrefix: CDNBucketPrefix.prod
   },
   'intern.nav.no': {
     naisCluster: 'prod-gcp',
     ingressClass: 'gw-intern-nav-no',
-    cdnEnv: CDNEnv.prod,
+    cdnHost: CDNEnv.prod,
     cdnBucketPrefix: CDNBucketPrefix.prod
   },
   'labs.nais.io': {
     naisCluster: 'labs-gcp',
     ingressClass: 'gw-labs-nais-io',
-    cdnEnv: CDNEnv.prod,
+    cdnHost: CDNEnv.prod,
     cdnBucketPrefix: CDNBucketPrefix.prod
   },
   'dev.nav.no': {
     naisCluster: 'dev-gcp',
     ingressClass: 'gw-dev-nav-no',
-    cdnEnv: CDNEnv.prod,
+    cdnHost: CDNEnv.prod,
     cdnBucketPrefix: CDNBucketPrefix.prod
   },
   'dev.intern.nav.no': {
     naisCluster: 'dev-gcp',
     ingressClass: 'gw-dev-intern-nav-no',
-    cdnEnv: CDNEnv.prod,
+    cdnHost: CDNEnv.prod,
     cdnBucketPrefix: CDNBucketPrefix.prod
   }
 }
@@ -101,6 +101,7 @@ export function cdnPathForApp(
 export function naisResourcesForApp(
   team: string,
   app: string,
+  env: string,
   ingressHost: string,
   ingressPath: string,
   bucketPath: string,
@@ -110,7 +111,8 @@ export function naisResourcesForApp(
 ): string {
   const ingressResource = ingressForApp(
     team,
-    app,
+    `${app}-${env}`,
+    env,
     ingressHost,
     ingressPath,
     ingressClass,
@@ -118,10 +120,10 @@ export function naisResourcesForApp(
     bucketVhost
   )
 
-  const serviceResource = serviceForApp(team, app, bucketVhost)
+  const serviceResource = serviceForApp(team, app, env, bucketVhost)
 
-  const ingressFilePath = `${tmpDir}/${team}-${app}-ingress.yaml`
-  const serviceFilePath = `${tmpDir}/${team}-${app}-service.yaml`
+  const ingressFilePath = `${tmpDir}/${team}-${app}-${env}-ingress.yaml`
+  const serviceFilePath = `${tmpDir}/${team}-${app}-${env}-service.yaml`
 
   mkdirSync(tmpDir, {recursive: true})
   writeFileSync(ingressFilePath, String(ingressResource))
@@ -156,7 +158,7 @@ export function spaSetupTask(
   ingress: string,
   env = ''
 ): {
-  cdnEnv: string
+  cdnHost: string
   cdnDest: string
   naisCluster: string
   naisResources: string
@@ -164,13 +166,14 @@ export function spaSetupTask(
 } {
   const {hostname: ingressHost, pathname: ingressPath} = new URL(ingress)
 
-  const {naisCluster, ingressClass, cdnEnv, cdnBucketPrefix} =
+  const {naisCluster, ingressClass, cdnHost, cdnBucketPrefix} =
     parseIngress(ingressHost)
   env = env || naisCluster
   const bucketPath = cdnPathForApp(team, app, env, cdnBucketPrefix)
   const naisResources = naisResourcesForApp(
     team,
     app,
+    env,
     ingressHost,
     ingressPath,
     bucketPath,
@@ -179,7 +182,7 @@ export function spaSetupTask(
   )
   const naisVars = ''
   return {
-    cdnEnv,
+    cdnHost,
     cdnDest: bucketPath,
     naisCluster,
     naisResources,

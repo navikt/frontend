@@ -1,0 +1,59 @@
+name: 'SPA Deploy Action'
+description: 'Upload Single Page Application (SPA) to CDN and deploy to NAIS'
+inputs:
+  team-name:
+    description: 'Team name'
+    required: true
+  app-name:
+    description: 'Application name'
+    required: true
+  source:
+    description: 'Application source directory'
+    required: true
+  environment:
+    description: 'Environment name'
+    required: true
+  ingress:
+    description: 'Application ingress URL'
+    required: true
+  nais-deploy-apikey:
+    description: 'NAIS deploy API key'
+    required: true
+
+outputs:
+  url:
+    description: "SPA URL"
+    value: ${{ inputs.ingress }}
+
+runs:
+  using: "composite"
+  steps:
+    - id: setup
+      name: Setup for SPA deploy
+      uses: ./actions/spa-setup-task
+      with:
+        team-name: ${{ inputs.team-name }}
+        app-name: ${{ inputs.app-name }}
+        ingress: ${{ inputs.ingress }}
+        source: ${{ inputs.source }}
+        environment: ${{ inputs.environment }}
+
+    - id: cdn-upload
+      name: Upload SPA to CDN
+      uses: ./actions/cdn-upload/v1
+      with:
+        cdn-environment: ${{ steps.setup.outputs.cdn-environment }}
+        cdn-team-name: ${{ inputs.team-name }}
+        source: ${{ inputs.source }}
+        source-keep-parent-name: false
+        destination: ${{ steps.setup.outputs.cdn-destination }}
+
+    - id: nais-deploy
+      name: Deploy SPA to NAIS
+      uses: nais/deploy/actions/deploy@v1
+      env:
+        APIKEY: ${{ inputs.nais-deploy-apikey }}
+        CLUSTER: ${{ steps.setup.outputs.nais-cluster }}
+        RESOURCE: ${{ steps.setup.outputs.nais-resource }}
+        VAR: ${{ steps.setup.outputs.nais-var }}
+        TEAM: ${{ inputs.team-name }}

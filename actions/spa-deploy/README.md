@@ -13,7 +13,6 @@ En GitHub Action som publiserer en Single Page Application (SPA) til NAV CDN og 
 * Versjonering støttes ikke
 * Opprydding av gamle statiske filer støttes ikke
 * Navneendring av applikasjonen støttes ikke
-* Det støttes kun en ingress per applikasjon
 
 ## Bruk
 
@@ -65,6 +64,17 @@ Statiske filer vil bli lastet opp til følgende adresse i NAV CDN:
 
 ```text
 https://cdn.nav.no/<team-name>/<app-name>/<env>/
+```
+
+### Flere ingresser
+
+For å få applikasjonen tilgjengelig over flere ingresser kan du sette `ingress` til en kommaseparert liste av ingresser:
+
+```yaml
+      - uses: navikt/frontend/actions/spa-deploy/v1@main
+        with:
+          ...
+          ingress: https://team.nav.no/min-frontend,https://team.nav.no/andre-ingress
 ```
 
 ## App Konfigurasjon

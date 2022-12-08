@@ -16,12 +16,28 @@ test('domainForHost()', () => {
 })
 
 test('isValidIngress()', () => {
-  expect(spa.isValidIngress('h/tsdf.no')).toBe(false)
-  expect(spa.isValidIngress('https://nav.no/')).toBe(false)
-  expect(spa.isValidIngress('https://example.com/')).toBe(false)
-  expect(spa.isValidIngress('https://www.nav.no/')).toBe(true)
-  expect(spa.isValidIngress('https://www.nav.no/foobar')).toBe(true)
-  expect(spa.isValidIngress('https://www.dev.nav.no/foobar')).toBe(true)
+  const valids = [
+    'https://www.nav.no/',
+    'https://www.nav.no/foobar',
+    'https://www.dev.nav.no/foobar'
+  ]
+  const invalids = ['h/tsdf.no', 'https://nav.no/', 'https://example.com/']
+
+  for (const valid of valids) {
+    for (const invalid of invalids) {
+      expect(spa.isValidIngress([invalid])).toBe(false)
+      expect(spa.isValidIngress([valid, invalid])).toBe(false)
+      expect(spa.isValidIngress([invalid, valid])).toBe(false)
+    }
+
+    for (const valid2 of valids) {
+      if (valid !== valid2) {
+        expect(spa.isValidIngress([valid])).toBe(true)
+        expect(spa.isValidIngress([valid, valid2])).toBe(true)
+        expect(spa.isValidIngress([valid2, valid])).toBe(true)
+      }
+    }
+  }
 })
 
 test('isValidAppName()', () => {
@@ -68,11 +84,15 @@ test('naisResourcesForApp()', () => {
       'myteam',
       'myapp',
       'myenv',
-      'www.nav.no',
-      '/myapp',
+      [
+        {
+          ingressHost: 'www.nav.no',
+          ingressPath: '/myapp',
+          ingressClass: 'gw-foobar'
+        }
+      ],
       'bucket/path',
       'storage.googleapis.com',
-      'gw-foobar',
       tmpDir
     )
     .split(',')
@@ -86,11 +106,14 @@ test('naisResourcesForApp()', () => {
   const ingressYaml = YAML.parse(readFileSync(ingress, 'utf-8'))
   const serviceYaml = YAML.parse(readFileSync(service, 'utf-8'))
 
-  expect(ingressYaml.kind).toEqual('Ingress')
+  expect(ingressYaml.kind).toEqual('IngressList')
   expect(serviceYaml.kind).toEqual('Service')
 
-  expect(ingressYaml.spec.rules[0].host).toEqual('www.nav.no')
-  expect(ingressYaml.spec.rules[0].http.paths[0].backend.service.name).toEqual(
-    serviceYaml.metadata.name
-  )
+  expect(ingressYaml.items.length).toEqual(1)
+  expect(ingressYaml.items[0].metadata.name).toEqual('myapp-myenv-gw-foobar')
+  expect(ingressYaml.items[0].spec.rules.length).toEqual(1)
+  expect(ingressYaml.items[0].spec.rules[0].host).toEqual('www.nav.no')
+  expect(
+    ingressYaml.items[0].spec.rules[0].http.paths[0].backend.service.name
+  ).toEqual(serviceYaml.metadata.name)
 })

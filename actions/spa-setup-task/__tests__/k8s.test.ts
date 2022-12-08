@@ -52,9 +52,15 @@ test('ingressForApp()', () => {
   const team = 'myteam'
   const app = 'myapp'
   const env = 'myenv'
-  const ingressHost = 'https://myapp.nav.no/foo/bar'
-  const ingressPath = '/foo/bar'
-  const ingressClass = 'gw-nais-test'
+  const ingressHosts = {
+    'foo.bar.baz': {
+      paths: ['/foo/bar/baz']
+    },
+    'bar.baz': {
+      paths: ['/bar/baz', '/bar/baz/']
+    }
+  }
+  const ingressClass = 'gw-foobar'
   const bucketPath = 'foo/bar/baz'
   const bucketVhost = 'storage.googleapis.com'
 
@@ -62,20 +68,19 @@ test('ingressForApp()', () => {
     team,
     app,
     env,
-    ingressHost,
-    ingressPath,
+    ingressHosts,
     ingressClass,
     bucketPath,
     bucketVhost
   )
 
-  expect(ingress?.metadata?.name).toBe(`${app}-${env}`)
+  expect(ingress?.metadata?.name).toBe(`${app}-${env}-${ingressClass}`)
   expect(ingress?.metadata?.namespace).toBe(team)
   expect(ingress?.metadata?.labels?.app).toBe(app)
   expect(ingress?.metadata?.labels?.team).toBe(team)
   expect(ingress?.metadata?.labels?.env).toBe(env)
-  expect(ingress?.spec?.rules?.[0]?.host).toBe(ingressHost)
+  expect(ingress?.spec?.rules?.[0]?.host).toBe('foo.bar.baz')
   expect(ingress?.spec?.rules?.[0]?.http?.paths?.[0]?.path).toBe(
-    k8s.parsePath(ingressPath)
+    '/foo/bar/baz(/.*)?'
   )
 })

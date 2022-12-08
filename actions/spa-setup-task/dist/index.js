@@ -2694,7 +2694,7 @@ exports["default"] = _default;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.ingressForApp = exports.parsePath = exports.serviceForApp = exports.trimRight = exports.ingressAnnotations = void 0;
+exports.ingressForApp = exports.ingressesForApp = exports.normalizeIngresses = exports.parsePath = exports.serviceForApp = exports.trimRight = exports.ingressAnnotations = void 0;
 const regexSuffix = '(/.*)?';
 function ingressAnnotations(bucketPath, bucketVhost) {
     return {
@@ -2747,40 +2747,70 @@ function parsePath(path) {
     return path.length > 1 ? `${trimRight(path, '/')}${regexSuffix}` : '/';
 }
 exports.parsePath = parsePath;
-function ingressForApp(team, app, env, ingressHost, ingressPath, ingressClass, bucketPath, bucketVhost) {
-    const name = `${app}-${env}`;
-    const host = ingressHost;
-    const path = parsePath(ingressPath);
+function normalizeIngresses(ingresses) {
+    const out = { classes: {} };
+    for (const ingress of ingresses) {
+        if (out.classes[ingress.ingressClass] === undefined) {
+            out.classes[ingress.ingressClass] = {
+                hosts: {}
+            };
+        }
+        if (out.classes[ingress.ingressClass].hosts[ingress.ingressHost] === undefined) {
+            out.classes[ingress.ingressClass].hosts[ingress.ingressHost] = {
+                paths: []
+            };
+        }
+        out.classes[ingress.ingressClass].hosts[ingress.ingressHost].paths.push(ingress.ingressPath);
+    }
+    return out;
+}
+exports.normalizeIngresses = normalizeIngresses;
+function ingressesForApp(team, app, env, ingresses, bucketPath, bucketVhost) {
+    const normalized = normalizeIngresses(ingresses);
+    const ingressList = {
+        apiVersion: 'networking.k8s.io/v1',
+        kind: 'IngressList',
+        items: Object.keys(normalized.classes).map(ingressClass => {
+            const ingressHosts = normalized.classes[ingressClass].hosts;
+            return ingressForApp(team, app, env, ingressHosts, ingressClass, bucketPath, bucketVhost);
+        })
+    };
+    return ingressList;
+}
+exports.ingressesForApp = ingressesForApp;
+function ingressForApp(team, app, env, ingressHosts, ingressClass, bucketPath, bucketVhost) {
+    const serviceName = `${app}-${env}`;
+    const ingressName = `${app}-${env}-${ingressClass}`;
     const annotations = ingressAnnotations(bucketPath, bucketVhost);
     const ingressSpec = {
-        rules: [
-            {
+        ingressClassName: ingressClass,
+        rules: Object.keys(ingressHosts).map(host => {
+            return {
                 host,
                 http: {
-                    paths: [
-                        {
-                            path,
+                    paths: ingressHosts[host].paths.map(ingressPath => {
+                        return {
+                            path: parsePath(ingressPath),
                             pathType: 'ImplementationSpecific',
                             backend: {
                                 service: {
-                                    name,
+                                    name: serviceName,
                                     port: {
                                         number: 80
                                     }
                                 }
                             }
-                        }
-                    ]
+                        };
+                    })
                 }
-            }
-        ],
-        ingressClassName: ingressClass
+            };
+        })
     };
     return {
         apiVersion: 'networking.k8s.io/v1',
         kind: 'Ingress',
         metadata: {
-            name,
+            name: ingressName,
             namespace: team,
             labels: {
                 app,
@@ -2832,14 +2862,14 @@ function run() {
     const teamName = core.getInput('team-name');
     const appName = core.getInput('app-name');
     // const source: string = core.getInput('source')
-    const ingress = core.getInput('ingress');
+    const ingresses = core.getInput('ingress').split(',');
     const environment = core.getInput('environment');
-    const err = (0, spa_1.validateInputs)(teamName, appName, ingress);
+    const err = (0, spa_1.validateInputs)(teamName, appName, ingresses, environment);
     if (err) {
         core.setFailed(err.message);
         return;
     }
-    const { cdnHost, cdnDest, naisCluster, naisResources } = (0, spa_1.spaSetupTask)(teamName, appName, ingress, environment);
+    const { cdnHost, cdnDest, naisCluster, naisResources } = (0, spa_1.spaSetupTask)(teamName, appName, ingresses, environment);
     core.setOutput('cdn-environment', cdnHost);
     core.setOutput('cdn-destination', cdnDest);
     core.setOutput('cdn-team-name', teamName);
@@ -2919,15 +2949,19 @@ function domainForHost(host) {
     return domain;
 }
 exports.domainForHost = domainForHost;
-function isValidIngress(ingress) {
-    // check if the url is valid
-    try {
-        const url = new URL(ingress);
-        return parseIngress(url.host) !== undefined;
+function isValidIngress(ingresses) {
+    for (const ingress of ingresses) {
+        try {
+            const url = new URL(ingress);
+            if (parseIngress(url.host) === undefined) {
+                return false;
+            }
+        }
+        catch (e) {
+            return false;
+        }
     }
-    catch (e) {
-        return false;
-    }
+    return true;
 }
 exports.isValidIngress = isValidIngress;
 function isValidAppName(app) {
@@ -2947,20 +2981,29 @@ function cdnDestForApp(app, env) {
     return `${app}/${env}`;
 }
 exports.cdnDestForApp = cdnDestForApp;
-function naisResourcesForApp(team, app, env, ingressHost, ingressPath, bucketPath, bucketVhost, ingressClass, tmpDir = './tmp') {
-    const ingressResource = (0, k8s_1.ingressForApp)(team, app, env, ingressHost, ingressPath, ingressClass, bucketPath, bucketVhost);
+function naisResourcesForApp(team, app, env, ingresses, bucketPath, bucketVhost, tmpDir = './tmp') {
+    const ingressesResource = (0, k8s_1.ingressesForApp)(team, app, env, ingresses, bucketPath, bucketVhost);
     const serviceResource = (0, k8s_1.serviceForApp)(team, app, env, bucketVhost);
     const ingressFilePath = `${tmpDir}/${team}-${app}-${env}-ingress.yaml`;
     const serviceFilePath = `${tmpDir}/${team}-${app}-${env}-service.yaml`;
     (0, fs_1.mkdirSync)(tmpDir, { recursive: true });
-    (0, fs_1.writeFileSync)(ingressFilePath, yaml_1.default.stringify(ingressResource));
+    (0, fs_1.writeFileSync)(ingressFilePath, yaml_1.default.stringify(ingressesResource));
     (0, fs_1.writeFileSync)(serviceFilePath, yaml_1.default.stringify(serviceResource));
     return [ingressFilePath, serviceFilePath].join(',');
 }
 exports.naisResourcesForApp = naisResourcesForApp;
-function validateInputs(team, app, ingress) {
+function validateInputs(team, app, ingress, environment) {
+    if (!isValidAppName(team)) {
+        return Error(`Invalid team name: ${team}. Team name must match regex: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$`);
+    }
     if (!isValidAppName(app)) {
         return Error(`Invalid app name: ${app}. App name must match regex: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$`);
+    }
+    if (!isValidAppName(environment)) {
+        return Error(`Invalid environment name: ${environment}. Environment name must match regex: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$`);
+    }
+    if (ingress.length === 0) {
+        return Error('No ingress specified');
     }
     if (!isValidIngress(ingress)) {
         return Error(`Invalid ingress: ${ingress}. Ingress must be a valid URL with a known domain on format https://<host>/<path>`);
@@ -2968,17 +3011,30 @@ function validateInputs(team, app, ingress) {
     return null;
 }
 exports.validateInputs = validateInputs;
-function spaSetupTask(team, app, ingress, env = '') {
-    const { hostname: ingressHost, pathname: ingressPath } = new URL(ingress);
-    const { naisCluster, ingressClass, cdnHost, cdnBucketPrefix } = parseIngress(ingressHost);
-    env = env || naisCluster;
-    const bucketPath = cdnPathForApp(team, app, env, cdnBucketPrefix);
+function spaSetupTask(team, app, urls, env = '') {
+    let naisClusterFinal = '';
+    let cdnHostFinal = '';
+    let cdnBucketPrefixFinal = '';
+    const ingresses = [];
+    for (const ingress of urls) {
+        const { hostname: ingressHost, pathname: ingressPath } = new URL(ingress);
+        const { naisCluster, ingressClass, cdnHost, cdnBucketPrefix } = parseIngress(ingressHost);
+        ingresses.push({ ingressHost, ingressPath, ingressClass });
+        naisClusterFinal = naisClusterFinal || naisCluster;
+        cdnHostFinal = cdnHostFinal || cdnHost;
+        cdnBucketPrefixFinal = cdnBucketPrefixFinal || cdnBucketPrefix;
+        if (naisClusterFinal !== naisCluster) {
+            throw Error(`Ingresses must be on same cluster. Found ${naisClusterFinal} and ${naisCluster}`);
+        }
+    }
+    env = env || naisClusterFinal;
+    const bucketPath = cdnPathForApp(team, app, env, cdnBucketPrefixFinal);
     const cdnDest = cdnDestForApp(app, env);
-    const naisResources = naisResourcesForApp(team, app, env, ingressHost, ingressPath, bucketPath, defaultBucketVhost, ingressClass);
+    const naisResources = naisResourcesForApp(team, app, env, ingresses, bucketPath, defaultBucketVhost);
     return {
-        cdnHost,
+        cdnHost: cdnHostFinal,
         cdnDest,
-        naisCluster,
+        naisCluster: naisClusterFinal,
         naisResources
     };
 }

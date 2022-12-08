@@ -1,3 +1,4 @@
+import {Ingress} from './spa'
 import * as k8s from '@kubernetes/client-node'
 
 const regexSuffix = '(/.*)?'
@@ -62,51 +63,118 @@ export function parsePath(path: string): string {
   return path.length > 1 ? `${trimRight(path, '/')}${regexSuffix}` : '/'
 }
 
+type IngressMap = {
+  classes: {
+    [key: string]: {
+      hosts: IngressHosts
+    }
+  }
+}
+
+type IngressHosts = {
+  [key: string]: {
+    paths: string[]
+  }
+}
+
+export function normalizeIngresses(ingresses: Ingress[]): IngressMap {
+  const out: IngressMap = {classes: {}}
+
+  for (const ingress of ingresses) {
+    if (out.classes[ingress.ingressClass] === undefined) {
+      out.classes[ingress.ingressClass] = {
+        hosts: {}
+      }
+    }
+
+    if (
+      out.classes[ingress.ingressClass].hosts[ingress.ingressHost] === undefined
+    ) {
+      out.classes[ingress.ingressClass].hosts[ingress.ingressHost] = {
+        paths: []
+      }
+    }
+
+    out.classes[ingress.ingressClass].hosts[ingress.ingressHost].paths.push(
+      ingress.ingressPath
+    )
+  }
+
+  return out
+}
+
+export function ingressesForApp(
+  team: string,
+  app: string,
+  env: string,
+  ingresses: Ingress[],
+  bucketPath: string,
+  bucketVhost: string
+): k8s.V1IngressList {
+  const normalized = normalizeIngresses(ingresses)
+  const ingressList: k8s.V1IngressList = {
+    apiVersion: 'networking.k8s.io/v1',
+    kind: 'IngressList',
+    items: Object.keys(normalized.classes).map(ingressClass => {
+      const ingressHosts = normalized.classes[ingressClass].hosts
+      return ingressForApp(
+        team,
+        app,
+        env,
+        ingressHosts,
+        ingressClass,
+        bucketPath,
+        bucketVhost
+      )
+    })
+  }
+
+  return ingressList
+}
+
 export function ingressForApp(
   team: string,
   app: string,
   env: string,
-  ingressHost: string,
-  ingressPath: string,
+  ingressHosts: IngressHosts,
   ingressClass: string,
   bucketPath: string,
   bucketVhost: string
 ): k8s.V1Ingress {
-  const name = `${app}-${env}`
-  const host = ingressHost
-  const path = parsePath(ingressPath)
+  const serviceName = `${app}-${env}`
+  const ingressName = `${app}-${env}-${ingressClass}`
   const annotations = ingressAnnotations(bucketPath, bucketVhost)
 
   const ingressSpec: k8s.V1IngressSpec = {
-    rules: [
-      {
+    ingressClassName: ingressClass,
+    rules: Object.keys(ingressHosts).map(host => {
+      return {
         host,
         http: {
-          paths: [
-            {
-              path,
+          paths: ingressHosts[host].paths.map(ingressPath => {
+            return {
+              path: parsePath(ingressPath),
               pathType: 'ImplementationSpecific',
               backend: {
                 service: {
-                  name,
+                  name: serviceName,
                   port: {
                     number: 80
                   }
                 }
               }
             }
-          ]
+          })
         }
       }
-    ],
-    ingressClassName: ingressClass
+    })
   }
 
   return {
     apiVersion: 'networking.k8s.io/v1',
     kind: 'Ingress',
     metadata: {
-      name,
+      name: ingressName,
       namespace: team,
       labels: {
         app,

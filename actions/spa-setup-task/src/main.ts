@@ -5,10 +5,10 @@ function run(): void {
   const teamName: string = core.getInput('team-name')
   const appName: string = core.getInput('app-name')
   // const source: string = core.getInput('source')
-  const ingress: string = core.getInput('ingress')
+  const ingresses: string[] = core.getInput('ingress').split(',')
   const environment: string = core.getInput('environment')
 
-  const err = validateInputs(teamName, appName, ingress)
+  const err = validateInputs(teamName, appName, ingresses, environment)
   if (err) {
     core.setFailed(err.message)
     return
@@ -17,7 +17,7 @@ function run(): void {
   const {cdnHost, cdnDest, naisCluster, naisResources} = spaSetupTask(
     teamName,
     appName,
-    ingress,
+    ingresses,
     environment
   )
 

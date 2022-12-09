@@ -2982,14 +2982,19 @@ function cdnDestForApp(app, env) {
 }
 exports.cdnDestForApp = cdnDestForApp;
 function naisResourcesForApp(team, app, env, ingresses, bucketPath, bucketVhost, tmpDir = './tmp') {
-    const ingressesResource = (0, k8s_1.ingressesForApp)(team, app, env, ingresses, bucketPath, bucketVhost);
+    var _a, _b;
+    const filePaths = [];
     const serviceResource = (0, k8s_1.serviceForApp)(team, app, env, bucketVhost);
-    const ingressFilePath = `${tmpDir}/${team}-${app}-${env}-ingress.yaml`;
-    const serviceFilePath = `${tmpDir}/${team}-${app}-${env}-service.yaml`;
+    const ingressesResource = (0, k8s_1.ingressesForApp)(team, app, env, ingresses, bucketPath, bucketVhost);
     (0, fs_1.mkdirSync)(tmpDir, { recursive: true });
-    (0, fs_1.writeFileSync)(ingressFilePath, yaml_1.default.stringify(ingressesResource));
-    (0, fs_1.writeFileSync)(serviceFilePath, yaml_1.default.stringify(serviceResource));
-    return [ingressFilePath, serviceFilePath].join(',');
+    for (const item of [serviceResource, ...ingressesResource.items]) {
+        const name = ((_a = item.metadata) === null || _a === void 0 ? void 0 : _a.name) || 'unknown';
+        const type = ((_b = item.kind) === null || _b === void 0 ? void 0 : _b.toLowerCase()) || 'unknown';
+        const path = `${tmpDir}/${name}-${type}.yaml`;
+        filePaths.push(path);
+        (0, fs_1.writeFileSync)(path, yaml_1.default.stringify(item));
+    }
+    return filePaths.join(',');
 }
 exports.naisResourcesForApp = naisResourcesForApp;
 function validateInputs(team, app, ingress, environment) {

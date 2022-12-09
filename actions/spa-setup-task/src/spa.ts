@@ -122,6 +122,8 @@ export function naisResourcesForApp(
   bucketVhost: string,
   tmpDir = './tmp'
 ): string {
+  const filePaths: string[] = []
+  const serviceResource = serviceForApp(team, app, env, bucketVhost)
   const ingressesResource = ingressesForApp(
     team,
     app,
@@ -131,17 +133,18 @@ export function naisResourcesForApp(
     bucketVhost
   )
 
-  const serviceResource = serviceForApp(team, app, env, bucketVhost)
-
-  const ingressFilePath = `${tmpDir}/${team}-${app}-${env}-ingress.yaml`
-  const serviceFilePath = `${tmpDir}/${team}-${app}-${env}-service.yaml`
-
   mkdirSync(tmpDir, {recursive: true})
 
-  writeFileSync(ingressFilePath, YAML.stringify(ingressesResource))
-  writeFileSync(serviceFilePath, YAML.stringify(serviceResource))
+  for (const item of [serviceResource, ...ingressesResource.items]) {
+    const name = item.metadata?.name || 'unknown'
+    const type = item.kind?.toLowerCase() || 'unknown'
+    const path = `${tmpDir}/${name}-${type}.yaml`
 
-  return [ingressFilePath, serviceFilePath].join(',')
+    filePaths.push(path)
+    writeFileSync(path, YAML.stringify(item))
+  }
+
+  return filePaths.join(',')
 }
 
 export function validateInputs(

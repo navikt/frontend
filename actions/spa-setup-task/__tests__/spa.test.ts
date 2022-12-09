@@ -98,7 +98,7 @@ test('naisResourcesForApp()', () => {
     .split(',')
 
   expect(resources).toHaveLength(2)
-  const [ingress, service] = resources
+  const [service, ingress] = resources
 
   expect(ingress).toContain('ingress.yaml')
   expect(service).toContain('service.yaml')
@@ -106,14 +106,13 @@ test('naisResourcesForApp()', () => {
   const ingressYaml = YAML.parse(readFileSync(ingress, 'utf-8'))
   const serviceYaml = YAML.parse(readFileSync(service, 'utf-8'))
 
-  expect(ingressYaml.kind).toEqual('IngressList')
+  expect(ingressYaml.kind).toEqual('Ingress')
   expect(serviceYaml.kind).toEqual('Service')
 
-  expect(ingressYaml.items.length).toEqual(1)
-  expect(ingressYaml.items[0].metadata.name).toEqual('myapp-myenv-gw-foobar')
-  expect(ingressYaml.items[0].spec.rules.length).toEqual(1)
-  expect(ingressYaml.items[0].spec.rules[0].host).toEqual('www.nav.no')
-  expect(
-    ingressYaml.items[0].spec.rules[0].http.paths[0].backend.service.name
-  ).toEqual(serviceYaml.metadata.name)
+  expect(ingressYaml.metadata.name).toEqual('myapp-myenv-gw-foobar')
+  expect(ingressYaml.spec.rules.length).toEqual(1)
+  expect(ingressYaml.spec.rules[0].host).toEqual('www.nav.no')
+  expect(ingressYaml.spec.rules[0].http.paths[0].backend.service.name).toEqual(
+    serviceYaml.metadata.name
+  )
 })

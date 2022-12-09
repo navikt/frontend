@@ -1,6 +1,8 @@
 import * as k8s from '../src/k8s'
 import {expect, test} from '@jest/globals'
 import exp from 'constants'
+import {SpawnOptions} from 'child_process'
+import {Ingress} from '../src/spa'
 
 test('trimRight', () => {
   expect(k8s.trimRight('/foo/bar/', '/')).toBe('/foo/bar')
@@ -48,13 +50,66 @@ test('parsePath()', () => {
   expect(k8s.parsePath('/foo/')).toBe('/foo(/.*)?')
 })
 
+test('normalizeIngresses()', () => {
+  const ingresses: Ingress[] = [
+    {
+      ingressHost: 'foo.bar.baz',
+      ingressPath: '/foo/bar/baz',
+      ingressClass: 'gw-foobar'
+    },
+    {
+      ingressHost: 'foo.bar.baz',
+      ingressPath: '/bix/baz',
+      ingressClass: 'gw-foobar'
+    },
+    {
+      ingressHost: 'bar.baz',
+      ingressPath: '/bar/baz',
+      ingressClass: 'gw-foobar'
+    },
+    {
+      ingressHost: 'bar.baz',
+      ingressPath: '/bar/baz',
+      ingressClass: 'gw-barfoo'
+    }
+  ]
+
+  expect(k8s.normalizeIngresses(ingresses)).toEqual({
+    classes: {
+      'gw-foobar': {
+        hosts: {
+          'foo.bar.baz': {
+            paths: ['/foo/bar/baz', '/bix/baz']
+          },
+          'bar.baz': {
+            paths: ['/bar/baz']
+          }
+        }
+      },
+      'gw-barfoo': {
+        hosts: {
+          'bar.baz': {
+            paths: ['/bar/baz']
+          }
+        }
+      }
+    }
+  })
+})
+
 test('ingressForApp()', () => {
   const team = 'myteam'
   const app = 'myapp'
   const env = 'myenv'
-  const ingressHost = 'https://myapp.nav.no/foo/bar'
-  const ingressPath = '/foo/bar'
-  const ingressClass = 'gw-nais-test'
+  const ingressHosts = {
+    'foo.bar.baz': {
+      paths: ['/foo/bar/baz']
+    },
+    'bar.baz': {
+      paths: ['/bar/baz', '/bar/baz/']
+    }
+  }
+  const ingressClass = 'gw-foobar'
   const bucketPath = 'foo/bar/baz'
   const bucketVhost = 'storage.googleapis.com'
 
@@ -62,20 +117,19 @@ test('ingressForApp()', () => {
     team,
     app,
     env,
-    ingressHost,
-    ingressPath,
+    ingressHosts,
     ingressClass,
     bucketPath,
     bucketVhost
   )
 
-  expect(ingress?.metadata?.name).toBe(`${app}-${env}`)
+  expect(ingress?.metadata?.name).toBe(`${app}-${env}-${ingressClass}`)
   expect(ingress?.metadata?.namespace).toBe(team)
   expect(ingress?.metadata?.labels?.app).toBe(app)
   expect(ingress?.metadata?.labels?.team).toBe(team)
   expect(ingress?.metadata?.labels?.env).toBe(env)
-  expect(ingress?.spec?.rules?.[0]?.host).toBe(ingressHost)
+  expect(ingress?.spec?.rules?.[0]?.host).toBe('foo.bar.baz')
   expect(ingress?.spec?.rules?.[0]?.http?.paths?.[0]?.path).toBe(
-    k8s.parsePath(ingressPath)
+    '/foo/bar/baz(/.*)?'
   )
 })

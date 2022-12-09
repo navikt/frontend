@@ -1,6 +1,6 @@
 import YAML from 'yaml'
 import {mkdirSync, writeFileSync} from 'fs'
-import {ingressForApp, serviceForApp} from './k8s'
+import {ingressesForApp, serviceForApp} from './k8s'
 
 enum CDNEnv {
   prod = 'cdn.nav.no',
@@ -14,6 +14,12 @@ enum CDNBucketPrefix {
 
 type Clusters = {
   [key: string]: NaisCluster
+}
+
+export type Ingress = {
+  ingressHost: string
+  ingressPath: string
+  ingressClass: string
 }
 
 const defaultBucketVhost = 'storage.googleapis.com'
@@ -70,15 +76,19 @@ export function domainForHost(host: string): string {
   return domain
 }
 
-export function isValidIngress(ingress: string): boolean {
-  // check if the url is valid
-
-  try {
-    const url = new URL(ingress)
-    return parseIngress(url.host) !== undefined
-  } catch (e) {
-    return false
+export function isValidIngress(ingresses: string[]): boolean {
+  for (const ingress of ingresses) {
+    try {
+      const url = new URL(ingress)
+      if (parseIngress(url.host) === undefined) {
+        return false
+      }
+    } catch (e) {
+      return false
+    }
   }
+
+  return true
 }
 
 export function isValidAppName(app: string): boolean {
@@ -107,45 +117,62 @@ export function naisResourcesForApp(
   team: string,
   app: string,
   env: string,
-  ingressHost: string,
-  ingressPath: string,
+  ingresses: Ingress[],
   bucketPath: string,
   bucketVhost: string,
-  ingressClass: string,
   tmpDir = './tmp'
 ): string {
-  const ingressResource = ingressForApp(
+  const filePaths: string[] = []
+  const serviceResource = serviceForApp(team, app, env, bucketVhost)
+  const ingressesResource = ingressesForApp(
     team,
     app,
     env,
-    ingressHost,
-    ingressPath,
-    ingressClass,
+    ingresses,
     bucketPath,
     bucketVhost
   )
 
-  const serviceResource = serviceForApp(team, app, env, bucketVhost)
-
-  const ingressFilePath = `${tmpDir}/${team}-${app}-${env}-ingress.yaml`
-  const serviceFilePath = `${tmpDir}/${team}-${app}-${env}-service.yaml`
-
   mkdirSync(tmpDir, {recursive: true})
-  writeFileSync(ingressFilePath, YAML.stringify(ingressResource))
-  writeFileSync(serviceFilePath, YAML.stringify(serviceResource))
 
-  return [ingressFilePath, serviceFilePath].join(',')
+  for (const item of [serviceResource, ...ingressesResource.items]) {
+    const name = item.metadata?.name || 'unknown'
+    const type = item.kind?.toLowerCase() || 'unknown'
+    const path = `${tmpDir}/${name}-${type}.yaml`
+
+    filePaths.push(path)
+    writeFileSync(path, YAML.stringify(item))
+  }
+
+  return filePaths.join(',')
 }
 
 export function validateInputs(
   team: string,
   app: string,
-  ingress: string
+  ingress: string[],
+  environment: string
 ): Error | null {
+  if (!isValidAppName(team)) {
+    return Error(
+      `Invalid team name: ${team}. Team name must match regex: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$`
+    )
+  }
+
   if (!isValidAppName(app)) {
     return Error(
       `Invalid app name: ${app}. App name must match regex: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$`
     )
+  }
+
+  if (!isValidAppName(environment)) {
+    return Error(
+      `Invalid environment name: ${environment}. Environment name must match regex: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$`
+    )
+  }
+
+  if (ingress.length === 0) {
+    return Error('No ingress specified')
   }
 
   if (!isValidIngress(ingress)) {
@@ -160,7 +187,7 @@ export function validateInputs(
 export function spaSetupTask(
   team: string,
   app: string,
-  ingress: string,
+  urls: string[],
   env = ''
 ): {
   cdnHost: string
@@ -168,27 +195,46 @@ export function spaSetupTask(
   naisCluster: string
   naisResources: string
 } {
-  const {hostname: ingressHost, pathname: ingressPath} = new URL(ingress)
+  let naisClusterFinal = ''
+  let cdnHostFinal = ''
+  let cdnBucketPrefixFinal = ''
 
-  const {naisCluster, ingressClass, cdnHost, cdnBucketPrefix} =
-    parseIngress(ingressHost)
-  env = env || naisCluster
-  const bucketPath = cdnPathForApp(team, app, env, cdnBucketPrefix)
+  const ingresses: Ingress[] = []
+
+  for (const ingress of urls) {
+    const {hostname: ingressHost, pathname: ingressPath} = new URL(ingress)
+    const {naisCluster, ingressClass, cdnHost, cdnBucketPrefix} =
+      parseIngress(ingressHost)
+
+    ingresses.push({ingressHost, ingressPath, ingressClass})
+
+    naisClusterFinal = naisClusterFinal || naisCluster
+    cdnHostFinal = cdnHostFinal || cdnHost
+    cdnBucketPrefixFinal = cdnBucketPrefixFinal || cdnBucketPrefix
+
+    if (naisClusterFinal !== naisCluster) {
+      throw Error(
+        `Ingresses must be on same cluster. Found ${naisClusterFinal} and ${naisCluster}`
+      )
+    }
+  }
+
+  env = env || naisClusterFinal
+  const bucketPath = cdnPathForApp(team, app, env, cdnBucketPrefixFinal)
   const cdnDest = cdnDestForApp(app, env)
   const naisResources = naisResourcesForApp(
     team,
     app,
     env,
-    ingressHost,
-    ingressPath,
+    ingresses,
     bucketPath,
-    defaultBucketVhost,
-    ingressClass
+    defaultBucketVhost
   )
+
   return {
-    cdnHost,
+    cdnHost: cdnHostFinal,
     cdnDest,
-    naisCluster,
+    naisCluster: naisClusterFinal,
     naisResources
   }
 }

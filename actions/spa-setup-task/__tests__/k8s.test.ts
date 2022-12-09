@@ -1,6 +1,8 @@
 import * as k8s from '../src/k8s'
 import {expect, test} from '@jest/globals'
 import exp from 'constants'
+import {SpawnOptions} from 'child_process'
+import {Ingress} from '../src/spa'
 
 test('trimRight', () => {
   expect(k8s.trimRight('/foo/bar/', '/')).toBe('/foo/bar')
@@ -46,6 +48,53 @@ test('parsePath()', () => {
   expect(k8s.parsePath('/')).toBe('/')
   expect(k8s.parsePath('/foo')).toBe('/foo(/.*)?')
   expect(k8s.parsePath('/foo/')).toBe('/foo(/.*)?')
+})
+
+test('normalizeIngresses()', () => {
+  const ingresses: Ingress[] = [
+    {
+      ingressHost: 'foo.bar.baz',
+      ingressPath: '/foo/bar/baz',
+      ingressClass: 'gw-foobar'
+    },
+    {
+      ingressHost: 'foo.bar.baz',
+      ingressPath: '/bix/baz',
+      ingressClass: 'gw-foobar'
+    },
+    {
+      ingressHost: 'bar.baz',
+      ingressPath: '/bar/baz',
+      ingressClass: 'gw-foobar'
+    },
+    {
+      ingressHost: 'bar.baz',
+      ingressPath: '/bar/baz',
+      ingressClass: 'gw-barfoo'
+    }
+  ]
+
+  expect(k8s.normalizeIngresses(ingresses)).toEqual({
+    classes: {
+      'gw-foobar': {
+        hosts: {
+          'foo.bar.baz': {
+            paths: ['/foo/bar/baz', '/bix/baz']
+          },
+          'bar.baz': {
+            paths: ['/bar/baz']
+          }
+        }
+      },
+      'gw-barfoo': {
+        hosts: {
+          'bar.baz': {
+            paths: ['/bar/baz']
+          }
+        }
+      }
+    }
+  })
 })
 
 test('ingressForApp()', () => {

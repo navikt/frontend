@@ -39,6 +39,6 @@ jobs:
           app-name: fp-react-cdn
           team-name: frontendplattform
           environment: labs
-          ingress: https://fp-react-cdn.labs.nais.io/
+          ingress: https://fp-react-cdn.labs.nais.io/,https://fp-react-cdn.labs.nais.io/foo
           source: react/cdn/build
           nais-deploy-apikey: ${{ secrets.NAIS_DEPLOY_APIKEY }}

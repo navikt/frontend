@@ -33,7 +33,7 @@ jobs:
       - run: npm run lint
       - run: npm run build
 
-      - uses: ./actions/spa-deploy/v1
+      - uses: navikt/frontend/actions/spa-deploy/v1@main
         # if: github.ref == 'refs/heads/main'
         with:
           app-name: fp-react-cdn

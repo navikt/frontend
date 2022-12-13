@@ -30,7 +30,7 @@ runs:
   steps:
     - id: setup
       name: Setup for SPA deploy
-      uses: ./actions/spa-setup-task
+      uses: navikt/frontend/actions/spa-setup-task@main
       with:
         team-name: ${{ inputs.team-name }}
         app-name: ${{ inputs.app-name }}
@@ -40,7 +40,7 @@ runs:
 
     - id: cdn-upload
       name: Upload SPA to CDN
-      uses: ./actions/cdn-upload/v1
+      uses: navikt/frontend/actions/cdn-upload/v1@main
       with:
         cdn-environment: ${{ steps.setup.outputs.cdn-environment }}
         cdn-team-name: ${{ inputs.team-name }}

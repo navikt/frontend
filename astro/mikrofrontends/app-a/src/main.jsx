@@ -1,12 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import MicroFrontend from "./MicroFrontend";
-import "./index.css";
+import Mikrofrontend from "./Mikrofrontend";
 
 ReactDOM.render(
   <React.StrictMode>
     <main>
-      <MicroFrontend />
+      <Mikrofrontend />
     </main>
   </React.StrictMode>,
   document.getElementById("root")

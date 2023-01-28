@@ -1,4 +1,4 @@
-# tms-astro-mikrofrontend-eksempel
+# Mikrofrontends med Astro
 
 Denne demoen bruker EcmaScript Moduler (ESM) og url-imports for å kjøre client side composition av mikrofrontends. Express brukes for å serve assets, men ideelt burde man bruke [frontend-plattformen](https://github.com/nais/frontend-plattform).
 

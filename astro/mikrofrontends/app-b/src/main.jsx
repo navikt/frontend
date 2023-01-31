@@ -1,12 +1,14 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import MicroFrontend from "./MicroFrontend";
+import { createRoot } from "react-dom/client";
+import Mikrofrontend from "./Mikrofrontend";
 
-ReactDOM.render(
+const container = document.getElementById("root");
+const root = createRoot(container);
+
+root.render(
   <React.StrictMode>
     <main>
-      <MicroFrontend />
+      <Mikrofrontend />
     </main>
-  </React.StrictMode>,
-  document.getElementById("root")
+  </React.StrictMode>
 );

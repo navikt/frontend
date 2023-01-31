@@ -1,12 +1,22 @@
-import React from "https://www.nav.no/tms-min-side-assets/react/18/esm/index.js"
-import MicroFrontendA from "http://localhost:7100/bundle.js"
-import MicroFrontendB from "http://localhost:7200/bundle.js"
+import React, { useEffect } from "react"
+import { injectMikrofrontendA } from "http://localhost:7100/bundle.js"
+import { injectMikrofrontendB } from "http://localhost:7200/bundle.js"
 
-const ReactComponent = () => (
-  <>
-    <MicroFrontendA />
-    <MicroFrontendB />
-  </>
-);
+const mountpointA = "mikrofrontend-a";
+const mountpointB = "mikrofrontend-b";
+
+const ReactComponent = () => {
+  useEffect(() => {
+    injectMikrofrontendA(mountpointA);
+    injectMikrofrontendB(mountpointB);
+  }, []);
+
+  return (
+    <>
+      <div id={mountpointA} />
+      <div id={mountpointB} />
+    </>
+  );
+};
 
 export default ReactComponent;

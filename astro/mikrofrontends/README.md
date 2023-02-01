@@ -10,4 +10,6 @@ Dette eksempelet bruker EcmaScript Moduler (ESM) og url-imports for å kjøre cl
 
 ## Shared dependencies
 
-Appene kan kjøre på forskjellige react tversjoner, men disse kan ikke deles på tvers. Andre dependencies kan deles ved å bruke import maps, enten ved byggetid eller i klienten. 
+Dependencies kan deles på tvers av mikrofrontends og caches i browseren. For å aligne versjoner på dependencies så kan man bruke importmaps i Layout.astro og sette dem som external ved byggetid.
+
+Mikrofrontenden i dette eksempelet kan kjøre på forskjellige react versjoner.

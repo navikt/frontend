@@ -1,4 +1,4 @@
-# Mikrofrontends med Astro
+# Mikrofrontends med Vite
 
 Dette eksempelet bruker EcmaScript Moduler (ESM) og url-imports for å kjøre client side composition av mikrofrontends. Express brukes for å serve assets, men ideelt burde man bruke [frontend-plattformen](https://github.com/nais/frontend-plattform).
 
@@ -10,6 +10,4 @@ Dette eksempelet bruker EcmaScript Moduler (ESM) og url-imports for å kjøre cl
 
 ## Shared dependencies
 
-Dependencies som hentes fra CDN kan deles på tvers av mikrofrontends og caches i browseren. For å aligne versjoner på dependencies så kan man bruke importmaps i Layout.astro og sette dem som external ved byggetid.
-
-Mikrofrontendene i dette eksempelet kan kjøre på forskjellige react versjoner.
+Dependencies som hentes fra CDN kan deles på tvers av mikrofrontends og caches i browseren. For å aligne versjoner på dependencies så kan man bruke importmaps i browseren og sette dem som external ved byggetid.

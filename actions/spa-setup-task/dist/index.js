@@ -2932,9 +2932,15 @@ const hostMap = {
         cdnHost: CDNEnv.prod,
         cdnBucketPrefix: CDNBucketPrefix.prod
     },
-    'dev.intern.nav.no': {
+    'intern.dev.nav.no': {
         naisCluster: 'dev-gcp',
-        ingressClass: 'gw-dev-intern-nav-no',
+        ingressClass: 'nais-ingress',
+        cdnHost: CDNEnv.prod,
+        cdnBucketPrefix: CDNBucketPrefix.prod
+    },
+    'ekstern.dev.nav.no': {
+        naisCluster: 'dev-gcp',
+        ingressClass: 'nais-ingress-external',
         cdnHost: CDNEnv.prod,
         cdnBucketPrefix: CDNBucketPrefix.prod
     }

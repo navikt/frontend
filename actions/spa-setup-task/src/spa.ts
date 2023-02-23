@@ -56,6 +56,12 @@ const hostMap: Clusters = {
     cdnHost: CDNEnv.prod,
     cdnBucketPrefix: CDNBucketPrefix.prod
   },
+  'dev.intern.nav.no': {
+    naisCluster: 'dev-gcp',
+    ingressClass: 'gw-dev-intern-nav-no',
+    cdnHost: CDNEnv.prod,
+    cdnBucketPrefix: CDNBucketPrefix.prod
+  },
   'intern.dev.nav.no': {
     naisCluster: 'dev-gcp',
     ingressClass: 'nais-ingress',

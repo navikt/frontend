@@ -41,7 +41,7 @@ const Home: NextPage = () => {
           <Heading spacing level="2" size="medium">
             Bruk av Nextjs-lenker
           </Heading>
-          <NextLink passHref href="/#">
+          <NextLink legacyBehavior passHref href="/#">
             <Link>Lenke til en side</Link>
           </NextLink>
         </div>
@@ -49,7 +49,7 @@ const Home: NextPage = () => {
           <Heading spacing level="2" size="medium">
             OverridableComponent
           </Heading>
-          <NextLink passHref href="/">
+          <NextLink legacyBehavior passHref href="/">
             <Button as="a">{`Knapp med "a"-tag`}</Button>
           </NextLink>
         </div>

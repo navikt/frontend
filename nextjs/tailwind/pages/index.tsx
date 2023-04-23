@@ -8,7 +8,7 @@ const Home: NextPage = () => {
           Tailwind demo + designsystem-config
         </h1>
         <a
-          href="https://aksel.nav.no/designsystem/side/tailwind"
+          href="https://aksel.nav.no/grunnleggende/kode/tailwind"
           className="underline text-blue-500 mt-4 inline-block hover:no-underline focus:shadow-focus focus:bg-blue-800 focus:text-white focus:outline-none"
         >
           Dokumentasjon om Designsystem-config

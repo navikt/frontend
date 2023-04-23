@@ -10,11 +10,11 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/react": "2.0.2",
+    "@astrojs/react": "2.1.0",
     "@navikt/nav-dekoratoren-moduler": "1.9.0",
     "@types/react": "18.0.27",
     "@types/react-dom": "18.0.10",
-    "astro": "2.0.9",
+    "astro": "2.3.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   }

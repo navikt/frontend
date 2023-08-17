@@ -12,7 +12,7 @@ on:
     paths:
       - 'actions/spa-setup-task/**'
   pull_request:
-    paths-ignore:
+    paths:
       - 'actions/spa-setup-task/**'
   workflow_dispatch:
 

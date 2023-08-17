@@ -64,7 +64,7 @@ runs:
 
     # Invalidate cache if cache-invalidation is set to true
     - name: 'Set up Cloud SDK'
-      if: ${{ inputs.cache-invalidation == 'true' || ${{ inputs.no-cache-paths }} != '' }}
+      if: ${{ inputs.cache-invalidation == 'true' || ${{ inputs.no-cache-paths }} != ''
       uses: 'google-github-actions/setup-gcloud@v1'
 
     # Authenticate with Google Cloud using Workload Identity Federation

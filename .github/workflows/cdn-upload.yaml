@@ -1,0 +1,47 @@
+name: "CDN Upload"
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'actions/cdn-uplad/**'
+      - '.github/workflows/cdn-upload.yaml'
+  pull_request:
+    paths:
+      - 'actions/cdn-uplad/**'
+      - '.github/workflows/cdn-upload.yaml'
+
+jobs:
+  cdn-upload:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - id: timestamp
+        name: set timestamp
+        run: |
+          echo "TIMESTAMP=$(date +'%Y-%m-%dT%H:%M%z')" >> $GITHUB_ENV
+
+      - name: update index.html
+        run: |
+          sed -i "s/%%TIMESTAMP%%/${{ env.TIMESTAMP }}/g" data/index.html
+
+      - name: upload to cdn
+        uses: ./actions/cdn-upload/v1
+        with:
+          cdn-team-name: example
+          source: ./data
+          destination: /
+          no-cache-paths: data/index.html
+
+      - name: test cdn
+        run: |
+          curl -s https://cdn.nav.no/example/data/index.html | grep ${{ env.TIMESTAMP }}
+          curl -sI https://cdn.nav.no/example/data/index.html | grep "cache-control: no-store"
+

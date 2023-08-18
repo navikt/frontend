@@ -23,10 +23,29 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: ./actions/cdn-upload/v1
+      - id: timestamp
+        name: set timestamp
+        run: |
+          echo "::set-output name=timestamp::$(date +"%Y-%m-%dT%H:%M%z)" >> $GITHUB_ENV
+
+      - name: update index.html
+        run: |
+          sed -i "s/%%TIMESTAMP%%/${{ steps.timestamp.outputs.timestamp }}/g" data/index.html
+
+      - name: upload to cdn
+        uses: ./actions/cdn-upload/v1
         with:
           cdn-team-name: example
           source: ./data
           destination: /
           no-cache-paths: data/index.html
+
+      - name: test cdn
+        run: |
+          url="https://cdn.nav.no/example/data/index.html"
+          curl -s $url | grep ${{ steps.timestamp.outputs.timestamp }}
+          if [ $? -ne 0 ]; then
+            echo "timestamp not found in $url"
+            exit 1
+          fi
 

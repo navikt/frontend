@@ -1,0 +1,35 @@
+name: "CDN Upload"
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'actions/cdn-uplad/**'
+      - '.github/workflows/cdn-upload.yaml'
+  pull_request:
+    paths:
+      - 'actions/cdn-uplad/**'
+      - '.github/workflows/cdn-upload.yaml'
+
+jobs:
+  cdn-upload:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    defaults:
+      run:
+        working-directory: react/cdn
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ./actions/cdn-upload/v1
+        with:
+          cdn-team-name: example
+          source: ./data
+          destination: /
+

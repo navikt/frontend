@@ -64,7 +64,7 @@ runs:
 
     # Invalidate cache if cache-invalidation is set to true
     - name: 'Set up Cloud SDK'
-      if: ${{ inputs.cache-invalidation == 'true' || ${{ inputs.no-cache-paths }} != ''
+      if: ${{ inputs.cache-invalidation == 'true' || inputs.no-cache-paths != '' }}
       uses: 'google-github-actions/setup-gcloud@v1'
 
     # Authenticate with Google Cloud using Workload Identity Federation
@@ -115,7 +115,7 @@ runs:
               [Google Cloud Console]($console_url) → Caching or set \`cache-invalidation-background\` \
               to \`false\` in order to wait for the invalidation to complete." >> $GITHUB_STEP_SUMMARY
 
-    - if: ${{ inputs.no-cache-paths }} != ''
+    - if: ${{ inputs.no-cache-paths != '' }}
       shell: bash
       run: |
         paths=(${{ inputs.no-cache-paths }})

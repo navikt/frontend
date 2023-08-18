@@ -43,4 +43,5 @@ jobs:
       - name: test cdn
         run: |
           curl -s https://cdn.nav.no/example/data/index.html | grep ${{ env.TIMESTAMP }}
+          curl -sI https://cdn.nav.no/example/data/index.html | grep "cache-control: no-store"
 

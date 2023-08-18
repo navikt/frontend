@@ -25,12 +25,12 @@ jobs:
 
       - id: timestamp
         name: set timestamp
-        run: echo "::set-output name=timestamp::$(date +'%Y-%m-%dT%H:%M%z')" >> ${GITHUB_OUTPUT}
-
+        run: |
+          echo "TIMESTAMP=$(date +'%Y-%m-%dT%H:%M%z')" >> $GITHUB_ENV
 
       - name: update index.html
         run: |
-          sed -i "s/%%TIMESTAMP%%/${{ steps.timestamp.outputs.timestamp }}/g" data/index.html
+          sed -i "s/%%TIMESTAMP%%/${{ env.TIMESTAMP }}/g" data/index.html
 
       - name: upload to cdn
         uses: ./actions/cdn-upload/v1
@@ -42,5 +42,5 @@ jobs:
 
       - name: test cdn
         run: |
-          curl -s "${url}" | grep "${{ steps.timestamp.outputs.timestamp }}"
+          curl -s $url | grep ${{ env.TIMESTAMP }}
 

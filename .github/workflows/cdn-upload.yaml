@@ -42,5 +42,5 @@ jobs:
 
       - name: test cdn
         run: |
-          curl -s $url | grep ${{ env.TIMESTAMP }}
+          curl -s https://cdn.nav.no/example/data/index.html | grep ${{ env.TIMESTAMP }}
 

@@ -25,7 +25,8 @@ jobs:
 
       - id: timestamp
         name: set timestamp
-        run: echo "timestamp=$(date +'%Y-%m-%dT%H:%M%z')-$(git rev-parse --short HEAD)" >> ${GITHUB_ENV}
+        run: echo "::set-output name=timestamp::$(date +'%Y-%m-%dT%H:%M%z')" >> ${GITHUB_OUTPUT}
+
 
       - name: update index.html
         run: |

@@ -62,11 +62,6 @@ runs:
         echo "BUCKET_NAME=frontend-plattform-prod-${{ inputs.cdn-team-name }}" >> $GITHUB_ENV
         echo "SA_NAME=gh-${{ inputs.cdn-team-name }}" >> $GITHUB_ENV
 
-    # Invalidate cache if cache-invalidation is set to true
-    - name: 'Set up Cloud SDK'
-      if: ${{ inputs.cache-invalidation == 'true' || inputs.no-cache-paths != '' }}
-      uses: 'google-github-actions/setup-gcloud@v1'
-
     # Authenticate with Google Cloud using Workload Identity Federation
     - id: 'auth'
       uses: 'google-github-actions/auth@v0'
@@ -84,6 +79,11 @@ runs:
         path: '${{ inputs.source }}'
         parent: '${{ inputs.source-keep-parent-name }}'
         destination: '${{ env.BUCKET_NAME }}/${{ inputs.cdn-team-name }}/${{ inputs.destination }}'
+
+    # Invalidate cache if cache-invalidation is set to true
+    - name: 'Set up Cloud SDK'
+      if: ${{ inputs.cache-invalidation == 'true' || inputs.no-cache-paths != '' }}
+      uses: 'google-github-actions/setup-gcloud@v1'
 
     - name: 'Invalidating cache'
       if: ${{ inputs.cache-invalidation == 'true' }}
@@ -115,7 +115,8 @@ runs:
               [Google Cloud Console]($console_url) → Caching or set \`cache-invalidation-background\` \
               to \`false\` in order to wait for the invalidation to complete." >> $GITHUB_STEP_SUMMARY
 
-    - if: ${{ inputs.no-cache-paths != '' }}
+    - name: Set no-cache metadata
+      if: ${{ inputs.no-cache-paths != '' }}
       shell: bash
       run: |
         paths=(${{ inputs.no-cache-paths }})

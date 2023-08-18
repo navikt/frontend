@@ -32,4 +32,5 @@ jobs:
           cdn-team-name: example
           source: ./data
           destination: /
+          source-keep-parent-name: true
 

@@ -2910,31 +2910,25 @@ const defaultBucketVhost = 'storage.googleapis.com';
 const hostMap = {
     'nav.no': {
         naisCluster: 'prod-gcp',
-        ingressClass: 'gw-nav-no',
+        ingressClass: 'nais-ingress-external',
         cdnHost: CDNEnv.prod,
         cdnBucketPrefix: CDNBucketPrefix.prod
     },
     'intern.nav.no': {
         naisCluster: 'prod-gcp',
-        ingressClass: 'gw-intern-nav-no',
-        cdnHost: CDNEnv.prod,
-        cdnBucketPrefix: CDNBucketPrefix.prod
-    },
-    'labs.nais.io': {
-        naisCluster: 'labs-gcp',
-        ingressClass: 'gw-labs-nais-io',
+        ingressClass: 'nais-ingress',
         cdnHost: CDNEnv.prod,
         cdnBucketPrefix: CDNBucketPrefix.prod
     },
     'dev.nav.no': {
         naisCluster: 'dev-gcp',
-        ingressClass: 'gw-dev-nav-no',
+        ingressClass: 'nais-ingress-external',
         cdnHost: CDNEnv.prod,
         cdnBucketPrefix: CDNBucketPrefix.prod
     },
     'dev.intern.nav.no': {
         naisCluster: 'dev-gcp',
-        ingressClass: 'gw-dev-intern-nav-no',
+        ingressClass: 'nais-ingress',
         cdnHost: CDNEnv.prod,
         cdnBucketPrefix: CDNBucketPrefix.prod
     },

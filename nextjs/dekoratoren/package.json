@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@navikt/nav-dekoratoren-moduler": "^1.6.18",
+    "@navikt/nav-dekoratoren-moduler": "^2",
     "next": "13.3.1",
     "react": "18.2.0",
     "react-dom": "18.2.0"

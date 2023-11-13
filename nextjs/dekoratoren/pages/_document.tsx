@@ -6,24 +6,24 @@ import Document, {
   DocumentContext,
 } from "next/document";
 import {
-  Components,
-  Env,
+  DecoratorComponents, DecoratorFetchProps,
   fetchDecoratorReact,
-  Props,
 } from "@navikt/nav-dekoratoren-moduler/ssr";
 import React from "react";
 
-const decoratorEnv = "dev" as Exclude<Env, "localhost">;
+const decoratorEnv: "dev" | "prod" = process.env.NAIS_CLUSTER_NAME === "prod-gcp" ? "prod" : "dev";
 
-const decoratorParams: Props = {
+const decoratorProps: DecoratorFetchProps = {
   env: decoratorEnv,
-  context: "privatperson",
+  params: {
+    context: "privatperson",
+  }
 };
 
-class _Document extends Document<{ decorator: Components }> {
+class _Document extends Document<{ decorator: DecoratorComponents }> {
   static async getInitialProps(ctx: DocumentContext) {
     const initialProps = await Document.getInitialProps(ctx);
-    const decorator = await fetchDecoratorReact(decoratorParams);
+    const decorator = await fetchDecoratorReact(decoratorProps);
     return { ...initialProps, decorator };
   }
 

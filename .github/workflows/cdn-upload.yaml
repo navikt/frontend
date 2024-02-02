@@ -5,11 +5,11 @@ on:
     branches:
       - 'main'
     paths:
-      - 'actions/cdn-uplad/**/*'
+      - 'actions/cdn-upload/**/*'
       - '.github/workflows/cdn-upload.yaml'
   pull_request:
     paths:
-      - 'actions/cdn-uplad/**/*'
+      - 'actions/cdn-upload/**/*'
       - '.github/workflows/cdn-upload.yaml'
 
 jobs:

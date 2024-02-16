@@ -38,28 +38,25 @@ outputs:
 runs:
   using: "composite"
   steps:
-    # Set environment variables for cdn.dev.nav.no
     - id: "cdn"
       shell: bash
       run: |
-        echo "Setting environment variables for cdn.dev.nav.no"
         # TODO: project number needs to go
-        echo "PROJECT_NUMBER=718061667033" >> $GITHUB_ENV
+        echo "WORKLOAD_IDENTITY_POOL_NAME=projects/718161667033/locations/global/workloadIdentityPools/dev-nais-identity-pool" >> $GITHUB_ENV
         echo "PROJECT_ID=nais-management-7178" >> $GITHUB_ENV
-        echo "LOGICAL_NAME=frontend-plattform-dev" >> $GITHUB_ENV
-        echo "BUCKET_NAME=frontend-plattform-dev-${{ inputs.cdn-team-name }}" >> $GITHUB_ENV
-        echo "SA_NAME=gh-${{ inputs.cdn-team-name }}" >> $GITHUB_ENV
+        # V- DELETE THIS GUY, it's only used for cache invalidation which should be handled by nais-console
+        echo "LOGICAL_NAME=nais-cdn" >> $GITHUB_ENV
 
-    # TODO: Use nais-login
+        # V- We need to figure out how to :hocho: these numbers, they shouldn't be exposed to the user
+        echo "BUCKET_NAME=nais-cdn-dev-nais-${{ inputs.cdn-team-name }}-75b1" >> $GITHUB_ENV
+        echo "SA_NAME=cdn-${{ inputs.cdn-team-name }}-69bf" >> $GITHUB_ENV
+
     # Authenticate with Google Cloud using Workload Identity Federation
-    - id: "auth"
-      uses: "google-github-actions/auth@v2"
-      env:
-        GCP_PROJECT_ID: ${{ env.PROJECT_ID }}
-        GCP_SA_EMAIL: gh-${{ inputs.cdn-team-name }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
+    - uses: nais/login@v0
       with:
-        workload_identity_provider: "projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/${{ env.LOGICAL_NAME }}/providers/github-oidc-provider"
-        service_account: "${{ env.SA_NAME }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com"
+        project_id: ${{ env.PROJECT_ID}}
+        identity_provider: ${{ env.WORKLOAD_IDENTITY_POOL_NAME }}
+        team: ${{inputs.team}}
 
     # Upload files to Google Cloud Storage Bucket connected to CDN
     - id: "upload-file"
@@ -73,36 +70,6 @@ runs:
     - name: "Set up Cloud SDK"
       if: ${{ inputs.cache-invalidation == 'true' || inputs.no-cache-paths != '' }}
       uses: "google-github-actions/setup-gcloud@v1"
-
-    - name: "Invalidating cache"
-      if: ${{ inputs.cache-invalidation == 'true' }}
-      shell: bash
-      run: |
-        path="/${{ inputs.cdn-team-name }}/${{ inputs.destination }}"
-        path="${path%/}/*"
-
-        async=""
-        if [ "${{ inputs.cache-invalidation-background }}" = "true" ]; then
-          async="--async"
-        fi
-
-        gcloud compute url-maps invalidate-cdn-cache ${{ env.LOGICAL_NAME }} --global $async --path $path
-
-    - if: ${{ inputs.cache-invalidation == 'true' && inputs.cache-invalidation-background == 'true' }}
-      shell: bash
-      run: |
-        path="/${{ inputs.cdn-team-name }}/${{ inputs.destination }}"
-        path="${path%/}/*"
-
-        base_url="https://console.cloud.google.com/net-services/loadbalancing/details/httpAdvanced"
-        console_url="$base_url/${{ env.LOGICAL_NAME }}?project=${{ env.PROJECT_ID }}"
-
-        echo "### CDN Cache Invalidation" >> $GITHUB_STEP_SUMMARY
-        echo "Path: \`$path\`" >> $GITHUB_STEP_SUMMARY
-        echo "Cache invalidation is running in the background. It may take up to `15 minutes` \
-              before the cache is invalidated. You can check the status of the invalidation in \
-              [Google Cloud Console]($console_url) → Caching or set \`cache-invalidation-background\` \
-              to \`false\` in order to wait for the invalidation to complete." >> $GITHUB_STEP_SUMMARY
 
     - name: Set no-cache metadata
       if: ${{ inputs.no-cache-paths != '' }}

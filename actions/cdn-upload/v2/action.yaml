@@ -53,7 +53,7 @@ runs:
 
     # Authenticate with Google Cloud using Workload Identity Federation
 
-        - id: "auth"
+    - id: "auth"
       name: "Authenticate to Google Cloud"
       uses: "google-github-actions/auth@v2.1.0"
       with:

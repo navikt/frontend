@@ -56,7 +56,7 @@ runs:
       with:
         project_id: ${{ env.PROJECT_ID}}
         identity_provider: ${{ env.WORKLOAD_IDENTITY_POOL_NAME }}
-        team: ${{inputs.team}}
+        team: ${{ inputs.cdn-team-name }}
 
     # Upload files to Google Cloud Storage Bucket connected to CDN
     - id: "upload-file"

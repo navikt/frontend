@@ -42,7 +42,9 @@ runs:
       shell: bash
       run: |
         # TODO: project number needs to go
-        echo "WORKLOAD_IDENTITY_POOL_NAME=projects/718161667033/locations/global/workloadIdentityPools/dev-nais-identity-pool" >> $GITHUB_ENV
+        # //iam.googleapis.com/projects/718161667033/locations/global/workloadIdentityPools/<pool-id>/providers/<provider-id>
+
+        echo "WORKLOAD_IDENTITY_POOL_NAME=projects/718161667033/locations/global/workloadIdentityPools/dev-nais-identity-pool/providers/github-oidc-provider" >> $GITHUB_ENV
         echo "PROJECT_ID=nais-management-7178" >> $GITHUB_ENV
         # V- DELETE THIS GUY, it's only used for cache invalidation which should be handled by nais-console
         echo "LOGICAL_NAME=nais-cdn" >> $GITHUB_ENV

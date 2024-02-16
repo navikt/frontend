@@ -51,14 +51,14 @@ jobs:
 
 ## Input parametere
 
-| Navn | Beskrivelse | Påkrevd | Default |
-| ---- | ----------- | -------- | ------- |
-| `app-name` | Applikasjonsnavn | Yes | |
-| `team-name` | Teamnavn | Yes | |
-| `source` | Mappe med kompilert kildekode | Yes | |
-| `environment` | Miljø (kan være hvilken som helst streng) | Yes | |
-| `ingress` | Adresse applikasjonen skal være tilgjenglig på | Yes | |
-| `nais-deploy-apikey` | NAIS Deploy ApiKey | Yes | |
+| Navn                 | Beskrivelse                                    | Påkrevd  | Default |
+| ----                 | -----------                                    | -------- | ------- |
+| `app-name`           | Applikasjonsnavn                               | Yes      |         |
+| `team-name`          | Teamnavn                                       | Yes      |         |
+| `source`             | Mappe med kompilert kildekode                  | Yes      |         |
+| `environment`        | Miljø (kan være hvilken som helst streng)      | Yes      |         |
+| `ingress`            | Adresse applikasjonen skal være tilgjenglig på | Yes      |         |
+| `nais-deploy-apikey` | NAIS Deploy ApiKey                             | Yes      |         |
 
 Statiske filer vil bli lastet opp til følgende adresse i NAV CDN:
 

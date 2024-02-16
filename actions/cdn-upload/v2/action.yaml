@@ -39,38 +39,27 @@ runs:
   using: "composite"
   steps:
     # Set environment variables for cdn.dev.nav.no
-    - id: "dev-env"
-      if: ${{ inputs.cdn-environment == 'cdn.dev.nav.no' }}
+    - id: "cdn"
       shell: bash
       run: |
         echo "Setting environment variables for cdn.dev.nav.no"
-        echo "PROJECT_ID=95282974971" >> $GITHUB_ENV
-        echo "PROJECT_NAME=frontendplattform-dev-2535" >> $GITHUB_ENV
+        # TODO: project number needs to go
+        echo "PROJECT_NUMBER=718061667033" >> $GITHUB_ENV
+        echo "PROJECT_ID=nais-management-7178" >> $GITHUB_ENV
         echo "LOGICAL_NAME=frontend-plattform-dev" >> $GITHUB_ENV
         echo "BUCKET_NAME=frontend-plattform-dev-${{ inputs.cdn-team-name }}" >> $GITHUB_ENV
         echo "SA_NAME=gh-${{ inputs.cdn-team-name }}" >> $GITHUB_ENV
 
-    # Set environment variables for cdn.nav.no
-    - id: "prod-env"
-      if: ${{ inputs.cdn-environment == 'cdn.nav.no' }}
-      shell: bash
-      run: |
-        echo "Setting environment variables for cdn.nav.no"
-        echo "PROJECT_ID=59294802824" >> $GITHUB_ENV
-        echo "PROJECT_NAME=frontendplattform-prod-55b3" >> $GITHUB_ENV
-        echo "LOGICAL_NAME=frontend-plattform-prod" >> $GITHUB_ENV
-        echo "BUCKET_NAME=frontend-plattform-prod-${{ inputs.cdn-team-name }}" >> $GITHUB_ENV
-        echo "SA_NAME=gh-${{ inputs.cdn-team-name }}" >> $GITHUB_ENV
-
+    # TODO: Use nais-login
     # Authenticate with Google Cloud using Workload Identity Federation
     - id: "auth"
       uses: "google-github-actions/auth@v2"
       env:
         GCP_PROJECT_ID: ${{ env.PROJECT_ID }}
-        GCP_SA_EMAIL: gh-${{ inputs.cdn-team-name }}@${{ env.PROJECT_NAME }}.iam.gserviceaccount.com
+        GCP_SA_EMAIL: gh-${{ inputs.cdn-team-name }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com
       with:
         workload_identity_provider: "projects/${{ env.PROJECT_ID }}/locations/global/workloadIdentityPools/${{ env.LOGICAL_NAME }}/providers/github-oidc-provider"
-        service_account: "${{ env.SA_NAME }}@${{ env.PROJECT_NAME }}.iam.gserviceaccount.com"
+        service_account: "${{ env.SA_NAME }}@${{ env.PROJECT_ID }}.iam.gserviceaccount.com"
 
     # Upload files to Google Cloud Storage Bucket connected to CDN
     - id: "upload-file"

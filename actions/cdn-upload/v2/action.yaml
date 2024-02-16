@@ -49,14 +49,32 @@ runs:
 
         # V- We need to figure out how to :hocho: these numbers, they shouldn't be exposed to the user
         echo "BUCKET_NAME=nais-cdn-dev-nais-${{ inputs.cdn-team-name }}-75b1" >> $GITHUB_ENV
-        echo "SA_NAME=cdn-${{ inputs.cdn-team-name }}-69bf" >> $GITHUB_ENV
+        echo "SA_EMAIL=cdn-${{ inputs.cdn-team-name }}-69bf@nais-management-7178.iam.gserviceaccount.com" >> $GITHUB_ENV
 
     # Authenticate with Google Cloud using Workload Identity Federation
-    - uses: nais/login@v0
+
+        - id: "auth"
+      name: "Authenticate to Google Cloud"
+      uses: "google-github-actions/auth@v2.1.0"
       with:
-        project_id: ${{ env.PROJECT_ID}}
-        identity_provider: ${{ env.WORKLOAD_IDENTITY_POOL_NAME }}
-        team: ${{ inputs.cdn-team-name }}
+        workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_POOL_NAME }}
+        service_account: ${{ env.SA_EMAIL }}
+        token_format: "access_token"
+    - name: "Handle failure"
+      if: ${{ failure() && steps.auth.outcome == 'failure' }}
+      shell: bash
+      run: |
+        cat <<EOF
+        ::error ::Failed to authenticate to Google Cloud.
+        EOF
+
+        echo "Ensure that your team has write access to the Github-repository." >> $GITHUB_STEP_SUMMARY
+        echo "Ensure that you grant the following persmissions in your workflow:" >> $GITHUB_STEP_SUMMARY
+        echo '```yaml' >> $GITHUB_STEP_SUMMARY
+        echo "permissions:" >> $GITHUB_STEP_SUMMARY
+        echo "   contents: read" >> $GITHUB_STEP_SUMMARY
+        echo "   id-token: write" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
 
     # Upload files to Google Cloud Storage Bucket connected to CDN
     - id: "upload-file"

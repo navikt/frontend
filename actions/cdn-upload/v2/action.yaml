@@ -1,11 +1,11 @@
 name: "Upload to CDN"
 description: "Upload static assets to Frontend Plattform CDN"
 inputs:
-  cdn-environment:
+  environment:
     description: "CDN environment name (cdn.dev.nav.no or cdn.nav.no)"
     required: false
     default: "cdn.nav.no"
-  cdn-team-name:
+  team-name:
     description: "CDN team name"
     required: true
   source:

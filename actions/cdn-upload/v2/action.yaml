@@ -1,20 +1,12 @@
 name: "Upload to CDN"
-description: "Upload static assets to Frontend Plattform CDN"
+description: "Upload static assets to CDN"
 inputs:
-  environment:
-    description: "CDN environment name (cdn.dev.nav.no or cdn.nav.no)"
-    required: false
-    default: "cdn.nav.no"
   team-name:
     description: "CDN team name"
     required: true
   source:
     description: "Source directory"
     required: true
-  source-keep-parent-name:
-    description: "Keep parent directory name when uploading"
-    required: false
-    default: "true"
   destination:
     description: "Destination directory"
     required: true
@@ -22,10 +14,6 @@ inputs:
     description: "Cache invalidation"
     required: false
     default: "false"
-  cache-invalidation-background:
-    description: "Run cache invalidation in the background without waiting"
-    required: false
-    default: "true"
   no-cache-paths:
     description: "Comma separated list of paths that should not be cached"
     required: false
@@ -41,25 +29,46 @@ runs:
     - id: "cdn"
       shell: bash
       run: |
-        echo "WORKLOAD_IDENTITY_POOL_NAME=projects/718161667033/locations/global/workloadIdentityPools/dev-nais-identity-pool/providers/github-oidc-provider" >> $GITHUB_ENV
-        echo "PROJECT_ID=nais-management-7178" >> $GITHUB_ENV
-        # V- DELETE THIS GUY, it's only used for cache invalidation which should be handled by nais-console
-        echo "LOGICAL_NAME=nais-cdn" >> $GITHUB_ENV
+        if [ -z "${{ inputs.team-name }}" ]; then
+          echo "::error ::team not set. Please provide as input."
+          exit 1
+        fi
+        
+        function slugify() {
+          slug=${{ inputs.team-name }}
+          prefix="$1"
+          maxLength=30
 
-        # V- We need to figure out how to :hocho: these numbers, they shouldn't be exposed to the user
-        echo "BUCKET_NAME=nais-cdn-dev-nais-${{ inputs.cdn-team-name }}-75b1" >> $GITHUB_ENV
-        echo "SA_EMAIL=cdn-${{ inputs.cdn-team-name }}-69bf@nais-management-7178.iam.gserviceaccount.com" >> $GITHUB_ENV
+          hash=$(echo -n "$slug" | sha256sum | cut -d ' ' -f 1)
+
+          prefixLength=${#prefix}
+          hashLength=4
+          slugLength=$((maxLength - prefixLength - hashLength - 2))
+
+          truncatedSlug=$(echo -n "${slug:0:$slugLength}" | sed 's/-$//')
+          truncatedHash=$(echo -n "$hash" | head -c $hashLength)
+          echo $truncatedSlug-$truncateHash
+        }
+
+        echo "LOGICAL_NAME=nais-cdn" >> $GITHUB_ENV
+        slugify("cdn")
+        echo "SA_EMAIL=cdn-$truncatedSlug-$truncatedHash@${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}.iam.gserviceaccount.com" >> $GITHUB_ENV
+        
+        # TODO: tenant-domain is currently hard-coded
+        #  nais-cdn-{replace(tenant-domain, '.', '-')}-{team-name}-{hash}
+        slugify("nais-cdn-nav-no")
+        echo "BUCKET_NAME=nais-cdn-nav-no-$truncatedSlug-$truncatedHash" >> $GITHUB_ENV
 
     # Authenticate with Google Cloud using Workload Identity Federation
-
     - id: "auth"
       name: "Authenticate to Google Cloud"
       uses: "google-github-actions/auth@v2.1.0"
       with:
-        workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_POOL_NAME }}
+        workload_identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
         service_account: ${{ env.SA_EMAIL }}
         token_format: "access_token"
-    - name: "Handle failure"
+
+    - name: "Handle authentication failure"
       if: ${{ failure() && steps.auth.outcome == 'failure' }}
       shell: bash
       run: |
@@ -68,7 +77,7 @@ runs:
         EOF
 
         echo "Ensure that your team has write access to the Github-repository." >> $GITHUB_STEP_SUMMARY
-        echo "Ensure that you grant the following persmissions in your workflow:" >> $GITHUB_STEP_SUMMARY
+        echo "Ensure that you grant the following permissions in your workflow:" >> $GITHUB_STEP_SUMMARY
         echo '```yaml' >> $GITHUB_STEP_SUMMARY
         echo "permissions:" >> $GITHUB_STEP_SUMMARY
         echo "   contents: read" >> $GITHUB_STEP_SUMMARY
@@ -80,13 +89,35 @@ runs:
       uses: "google-github-actions/upload-cloud-storage@v2"
       with:
         path: "${{ inputs.source }}"
-        parent: "${{ inputs.source-keep-parent-name }}"
-        destination: "${{ env.BUCKET_NAME }}/${{ inputs.cdn-team-name }}/${{ inputs.destination }}"
+        parent: "true"
+        destination: "${{ env.BUCKET_NAME }}/${{ inputs.team-name }}/${{ inputs.destination }}"
 
     # Invalidate cache if cache-invalidation is set to true
     - name: "Set up Cloud SDK"
       if: ${{ inputs.cache-invalidation == 'true' || inputs.no-cache-paths != '' }}
       uses: "google-github-actions/setup-gcloud@v1"
+    - name: 'Invalidating cache'
+      if: ${{ inputs.cache-invalidation == 'true' }}
+      shell: bash
+      run: |
+        path="/${{ inputs.team-name }}/${{ inputs.destination }}"
+        path="${path%/}/*"
+
+        gcloud compute url-maps invalidate-cdn-cache ${{ env.LOGICAL_NAME }} --global --async --path $path
+    - if: ${{ inputs.cache-invalidation == 'true' }}
+      shell: bash
+      run: |
+        path="/${{ inputs.team-name }}/${{ inputs.destination }}"
+        path="${path%/}/*"
+
+        base_url="https://console.cloud.google.com/net-services/loadbalancing/details/httpAdvanced"
+        console_url="$base_url/${{ env.LOGICAL_NAME }}?project=${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}"
+
+        echo "### CDN Cache Invalidation" >> $GITHUB_STEP_SUMMARY
+        echo "Path: \`$path\`" >> $GITHUB_STEP_SUMMARY
+        echo "Cache invalidation is running in the background. It may take up to `15 minutes` \
+              before the cache is invalidated. You can check the status of the invalidation in \
+              [Google Cloud Console]($console_url) → Caching." >> $GITHUB_STEP_SUMMARY
 
     - name: Set no-cache metadata
       if: ${{ inputs.no-cache-paths != '' }}
@@ -96,5 +127,5 @@ runs:
         IFS=','
 
         for path in $paths; do
-          gsutil setmeta -h "Cache-Control:no-store" "gs://${BUCKET_NAME}/${{ inputs.cdn-team-name }}/$path"
+          gsutil setmeta -h "Cache-Control:no-store" "gs://${BUCKET_NAME}/${{ inputs.team-name }}/$path"
         done

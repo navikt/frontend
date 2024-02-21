@@ -49,7 +49,7 @@ runs:
         echo "LOGICAL_NAME=frontend-plattform-dev" >> $GITHUB_ENV
         echo "BUCKET_NAME=frontend-plattform-dev-${{ inputs.cdn-team-name }}" >> $GITHUB_ENV
         echo "SA_NAME=gh-${{ inputs.cdn-team-name }}" >> $GITHUB_ENV
-        echo "cdn.dev.nav.no will be deprecated. Please upload dev artifacts to cdn.nav.no under a separate folder, e.g /my-build-dev/" >> $GITHUB_STEP_SUMMARY
+        echo "❌ cdn.dev.nav.no will be deprecated. Please upload dev artifacts to cdn.nav.no under a separate folder, e.g /my-build-dev/" >> $GITHUB_STEP_SUMMARY
 
     # Set environment variables for cdn.nav.no
     - id: "prod-env"

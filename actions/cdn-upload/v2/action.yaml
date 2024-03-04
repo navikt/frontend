@@ -49,20 +49,23 @@ runs:
           hashLength=4
           slugLength=$((maxLength - prefixLength - hashLength - 2))
 
-          truncatedSlug=$(echo -n "${slug:0:$slugLength}" | sed 's/-$//')
+          # Remove hyphens only if they are at the end after truncation
+          truncatedSlug=$(echo -n "${slug:0:$slugLength}" | sed 's/-\}$//')
+
+          # Generate a new truncated hash for each call
           truncatedHash=$(echo -n "$hash" | head -c $hashLength)
-          echo $truncatedSlug-$truncateHash
+
+          echo "$truncatedSlug-$truncatedHash"
         }
 
         echo "LOGICAL_NAME=nais-cdn" >> $GITHUB_ENV
-        slugify "cdn"
-        echo "SA_EMAIL=cdn-$truncatedSlug-$truncatedHash@${{ inputs.nais_management_project_id }}.iam.gserviceaccount.com" >> $GITHUB_ENV
+        slug_result=$(slugify "cdn")
+        echo "SA_EMAIL=cdn-$slug_result" >> $GITHUB_ENV
 
         # TODO: tenant-domain is currently hard-coded
-        #  nais-cdn-{replace(tenant-domain, '.', '-')}-{team-name}-{hash}
-        slugify "nais-cdn-nav-no"
-        echo "BUCKET_NAME=nais-cdn-nav-no-$truncatedSlug-$truncatedHash" >> $GITHUB_ENV
-
+        # nais-cdn-{replace(tenant-domain, '.', '-')}-{team-name}-{hash}
+        slug_result=$(slugify "nais-cdn-nav-no")
+        echo "BUCKET_NAME=nais-cdn-nav-no-$slug_result" >> $GITHUB_ENV
     # Authenticate with Google Cloud using Workload Identity Federation
     - id: "auth"
       name: "Authenticate to Google Cloud"

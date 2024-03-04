@@ -79,7 +79,7 @@ runs:
         echo "LOGICAL_NAME=nais-cdn" >> $GITHUB_ENV
         slugify "cdn"
         slug_result=$(slugify "cdn")
-        echo "SA_EMAIL=cdn-$slug_result" >> $GITHUB_ENV
+        echo "SA_EMAIL=cdn-$slug_result@${{ inputs.nais_management_project_id }}.iam.gserviceaccount.com" >> $GITHUB_ENV
 
         # TODO: tenant-domain is currently hard-coded
         # nais-cdn-{replace(tenant-domain, '.', '-')}-{team-name}-{hash}

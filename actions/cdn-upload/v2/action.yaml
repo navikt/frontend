@@ -83,7 +83,7 @@ runs:
 
         # TODO: tenant-domain is currently hard-coded
         # nais-cdn-{replace(tenant-domain, '.', '-')}-{team-name}-{hash}
-        slugifyBucket "nav-no-${{ inputs.team-name }}"
+        slugifyBucket "nav-${{ inputs.team-name }}"
         slug_result=$(slugifyBucket "nav-${{ inputs.team-name }}")
         echo "BUCKET_NAME=nais-cdn-$slug_result" >> $GITHUB_ENV
     # Authenticate with Google Cloud using Workload Identity Federation

@@ -18,6 +18,10 @@ inputs:
     description: "Comma separated list of paths that should not be cached"
     required: false
     default: ""
+  nais_management_project_id:
+    required: true
+  nais_workload_identity_provider:
+    required: true
 
 outputs:
   uploaded:
@@ -33,7 +37,7 @@ runs:
           echo "::error ::team not set. Please provide as input."
           exit 1
         fi
-        
+
         function slugify() {
           slug=${{ inputs.team-name }}
           prefix="$1"
@@ -52,8 +56,8 @@ runs:
 
         echo "LOGICAL_NAME=nais-cdn" >> $GITHUB_ENV
         slugify("cdn")
-        echo "SA_EMAIL=cdn-$truncatedSlug-$truncatedHash@${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}.iam.gserviceaccount.com" >> $GITHUB_ENV
-        
+        echo "SA_EMAIL=cdn-$truncatedSlug-$truncatedHash@${{ inputs.nais_management_project_id }}.iam.gserviceaccount.com" >> $GITHUB_ENV
+
         # TODO: tenant-domain is currently hard-coded
         #  nais-cdn-{replace(tenant-domain, '.', '-')}-{team-name}-{hash}
         slugify("nais-cdn-nav-no")
@@ -64,7 +68,7 @@ runs:
       name: "Authenticate to Google Cloud"
       uses: "google-github-actions/auth@v2.1.0"
       with:
-        workload_identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+        workload_identity_provider: ${{ inputs.nais_workload_identity_provider }}
         service_account: ${{ env.SA_EMAIL }}
         token_format: "access_token"
 
@@ -96,7 +100,7 @@ runs:
     - name: "Set up Cloud SDK"
       if: ${{ inputs.cache-invalidation == 'true' || inputs.no-cache-paths != '' }}
       uses: "google-github-actions/setup-gcloud@v1"
-    - name: 'Invalidating cache'
+    - name: "Invalidating cache"
       if: ${{ inputs.cache-invalidation == 'true' }}
       shell: bash
       run: |

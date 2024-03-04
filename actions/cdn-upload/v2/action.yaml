@@ -55,12 +55,12 @@ runs:
         }
 
         echo "LOGICAL_NAME=nais-cdn" >> $GITHUB_ENV
-        slugify("cdn")
+        slugify "cdn"
         echo "SA_EMAIL=cdn-$truncatedSlug-$truncatedHash@${{ inputs.nais_management_project_id }}.iam.gserviceaccount.com" >> $GITHUB_ENV
 
         # TODO: tenant-domain is currently hard-coded
         #  nais-cdn-{replace(tenant-domain, '.', '-')}-{team-name}-{hash}
-        slugify("nais-cdn-nav-no")
+        slugify "nais-cdn-nav-no"
         echo "BUCKET_NAME=nais-cdn-nav-no-$truncatedSlug-$truncatedHash" >> $GITHUB_ENV
 
     # Authenticate with Google Cloud using Workload Identity Federation

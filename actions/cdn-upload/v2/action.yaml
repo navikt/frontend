@@ -115,7 +115,7 @@ runs:
         path="${path%/}/*"
 
         base_url="https://console.cloud.google.com/net-services/loadbalancing/details/httpAdvanced"
-        console_url="$base_url/${{ env.LOGICAL_NAME }}?project=${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}"
+        console_url="$base_url/${{ env.LOGICAL_NAME }}?project=${{ inputs.nais_management_project_id }}"
 
         echo "### CDN Cache Invalidation" >> $GITHUB_STEP_SUMMARY
         echo "Path: \`$path\`" >> $GITHUB_STEP_SUMMARY

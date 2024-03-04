@@ -2899,12 +2899,10 @@ const k8s_1 = __nccwpck_require__(130);
 var CDNEnv;
 (function (CDNEnv) {
     CDNEnv["prod"] = "cdn.nav.no";
-    CDNEnv["dev"] = "cdn.dev.nav.no";
 })(CDNEnv || (CDNEnv = {}));
 var CDNBucketPrefix;
 (function (CDNBucketPrefix) {
-    CDNBucketPrefix["prod"] = "frontend-plattform-prod-";
-    CDNBucketPrefix["dev"] = "frontend-plattform-dev-";
+    CDNBucketPrefix["prod"] = "nais-cdn-nav-";
 })(CDNBucketPrefix || (CDNBucketPrefix = {}));
 const defaultBucketVhost = 'storage.googleapis.com';
 const hostMap = {

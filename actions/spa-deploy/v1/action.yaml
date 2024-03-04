@@ -18,7 +18,8 @@ inputs:
     required: true
   nais-deploy-apikey:
     description: 'NAIS deploy API key'
-    required: true
+    required: false
+    default: ""
 
 outputs:
   url:

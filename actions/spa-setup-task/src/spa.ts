@@ -3,13 +3,11 @@ import {mkdirSync, writeFileSync} from 'fs'
 import {ingressesForApp, serviceForApp} from './k8s'
 
 enum CDNEnv {
-  prod = 'cdn.nav.no',
-  dev = 'cdn.dev.nav.no'
+  prod = 'cdn.nav.no'
 }
 
 enum CDNBucketPrefix {
-  prod = 'frontend-plattform-prod-',
-  dev = 'frontend-plattform-dev-'
+  prod = 'nais-cdn-nav-'
 }
 
 type Clusters = {

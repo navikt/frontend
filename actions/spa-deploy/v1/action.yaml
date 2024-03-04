@@ -51,7 +51,7 @@ runs:
 
     - id: nais-deploy
       name: Deploy SPA to NAIS
-      uses: nais/deploy/actions/deploy@v1
+      uses: nais/deploy/actions/deploy@v2
       env:
         APIKEY: ${{ inputs.nais-deploy-apikey }}
         CLUSTER: ${{ steps.setup.outputs.nais-cluster }}

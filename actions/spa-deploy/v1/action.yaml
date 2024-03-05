@@ -1,23 +1,23 @@
-name: 'SPA Deploy Action'
-description: 'Upload Single Page Application (SPA) to CDN and deploy to NAIS'
+name: "SPA Deploy Action"
+description: "Upload Single Page Application (SPA) to CDN and deploy to NAIS"
 inputs:
   team-name:
-    description: 'Team name'
+    description: "Team name"
     required: true
   app-name:
-    description: 'Application name'
+    description: "Application name"
     required: true
   source:
-    description: 'Application source directory'
+    description: "Application source directory"
     required: true
   environment:
-    description: 'Environment name'
+    description: "Environment name"
     required: true
   ingress:
-    description: 'Application ingress URL'
+    description: "Application ingress URL"
     required: true
   nais-deploy-apikey:
-    description: 'NAIS deploy API key'
+    description: "NAIS deploy API key"
     required: true
 
 outputs:
@@ -40,7 +40,7 @@ runs:
 
     - id: cdn-upload
       name: Upload SPA to CDN
-      uses: navikt/frontend/actions/cdn-upload/v1@main
+      uses: navikt/frontend/actions/cdn-upload/v2@cdn-action-v2
       with:
         cdn-environment: ${{ steps.setup.outputs.cdn-environment }}
         cdn-team-name: ${{ inputs.team-name }}
@@ -50,9 +50,8 @@ runs:
 
     - id: nais-deploy
       name: Deploy SPA to NAIS
-      uses: nais/deploy/actions/deploy@v1
+      uses: nais/deploy/actions/deploy@v2
       env:
-        APIKEY: ${{ inputs.nais-deploy-apikey }}
         CLUSTER: ${{ steps.setup.outputs.nais-cluster }}
         RESOURCE: ${{ steps.setup.outputs.nais-resource }}
         VAR: ${{ steps.setup.outputs.nais-var }}

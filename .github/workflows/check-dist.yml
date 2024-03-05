@@ -10,10 +10,10 @@ on:
     branches:
       - main
     paths:
-      - 'actions/spa-setup-task/**'
+      - "actions/spa-setup-task/**"
   pull_request:
     paths:
-      - 'actions/spa-setup-task/**'
+      - "actions/spa-setup-task/**"
   workflow_dispatch:
 
 jobs:
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: "20"
       - run: yarn install
       - run: yarn build
       - run: yarn package

@@ -3,22 +3,22 @@ name: "React.JS on CDN"
 on:
   push:
     branches:
-      - 'main'
+      - "main"
     paths:
-      - 'react/cdn/**'
-      - '.github/workflows/react-on-cdn.yaml'
+      - "react/cdn/**"
+      - ".github/workflows/react-on-cdn.yaml"
   pull_request:
     paths:
-      - 'react/cdn/**'
-      - '.github/workflows/react-on-cdn.yaml'
+      - "react/cdn/**"
+      - ".github/workflows/react-on-cdn.yaml"
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
 
     defaults:
       run:
@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: "20"
       - run: npm ci
       - run: npm run lint
       - run: npm run build

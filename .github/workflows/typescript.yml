@@ -1,4 +1,4 @@
-name: 'Typescript Actions'
+name: "Typescript Actions"
 on:
   pull_request:
     paths:
@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: "20"
       - run: yarn install
       - run: yarn all
 
@@ -39,8 +39,8 @@ jobs:
       - uses: actions/checkout@v3
       - uses: ./actions/spa-setup-task
         with:
-          team-name: 'team'
-          app-name: 'app'
-          source: 'src'
-          ingress: 'https://app.dev.intern.nav.no'
-          environment: 'dev'
+          team-name: "team"
+          app-name: "app"
+          source: "src"
+          ingress: "https://app.dev.intern.nav.no"
+          environment: "dev"

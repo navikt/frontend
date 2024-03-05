@@ -66,9 +66,8 @@ runs:
 
           hashLength=4
 
-
           # Remove hyphens only if they are at the end after truncation
-          truncatedSlug=$(echo -n "${slug:0:$slugLength}" | sed 's/-\}$//')
+          truncatedSlug=$(echo -n $slug | sed 's/-\}$//')
 
           # Generate a new truncated hash for each call
           truncatedHash=$(echo -n "$hash" | head -c $hashLength)

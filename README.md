@@ -55,7 +55,7 @@ For å slippe å bruke din egen token til å installere pakker fra en Github wor
 Dette er da stegene som trengs i workflowen (se komplett eksempel i [npm-publish-workflow.yml](npm-publish-workflow.yml)):
 
 ```yml
-- uses: actions/setup-node@v3
+- uses: actions/setup-node@v4
   with:
     node-version: 16
     registry-url: "https://npm.pkg.github.com"

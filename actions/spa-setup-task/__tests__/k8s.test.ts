@@ -13,7 +13,7 @@ test('trimRight', () => {
 
 test('ingressAnnotations()', () => {
   const bucketPath = 'foo/bar/baz'
-  const bucketVhost = 'storage.googleapis.com'
+  const bucketVhost = 'cdn.nav.no'
 
   const annotations = k8s.ingressAnnotations(bucketPath, bucketVhost) || {}
 
@@ -30,7 +30,7 @@ test('serviceForApp()', () => {
   const team = 'myteam'
   const app = 'myapp'
   const env = 'myenv'
-  const bucketVhost = 'storage.googleapis.com'
+  const bucketVhost = 'cdn.nav.no'
 
   const service = k8s.serviceForApp(team, app, env, bucketVhost)
 
@@ -111,7 +111,7 @@ test('ingressForApp()', () => {
   }
   const ingressClass = 'gw-foobar'
   const bucketPath = 'foo/bar/baz'
-  const bucketVhost = 'storage.googleapis.com'
+  const bucketVhost = 'cdn.nav.no'
 
   const ingress = k8s.ingressForApp(
     team,

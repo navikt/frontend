@@ -2,16 +2,6 @@ import YAML from 'yaml'
 import {mkdirSync, writeFileSync} from 'fs'
 import {ingressesForApp, serviceForApp} from './k8s'
 
-enum CDNEnv {
-  prod = 'cdn.nav.no',
-  dev = 'cdn.dev.nav.no'
-}
-
-enum CDNBucketPrefix {
-  prod = 'frontend-plattform-prod-',
-  dev = 'frontend-plattform-dev-'
-}
-
 type Clusters = {
   [key: string]: NaisCluster
 }
@@ -22,51 +12,37 @@ export type Ingress = {
   ingressClass: string
 }
 
-const defaultBucketVhost = 'storage.googleapis.com'
+const defaultBucketVhost = 'cdn.nav.no'
 
 type NaisCluster = {
   naisCluster: string
   ingressClass: string
-  cdnHost: string
-  cdnBucketPrefix: string
 }
 
 const hostMap: Clusters = {
   'nav.no': {
     naisCluster: 'prod-gcp',
-    ingressClass: 'nais-ingress-external',
-    cdnHost: CDNEnv.prod,
-    cdnBucketPrefix: CDNBucketPrefix.prod
+    ingressClass: 'nais-ingress-external'
   },
   'intern.nav.no': {
     naisCluster: 'prod-gcp',
-    ingressClass: 'nais-ingress',
-    cdnHost: CDNEnv.prod,
-    cdnBucketPrefix: CDNBucketPrefix.prod
+    ingressClass: 'nais-ingress'
   },
   'dev.nav.no': {
     naisCluster: 'dev-gcp',
-    ingressClass: 'nais-ingress-external',
-    cdnHost: CDNEnv.prod,
-    cdnBucketPrefix: CDNBucketPrefix.prod
+    ingressClass: 'nais-ingress-external'
   },
   'dev.intern.nav.no': {
     naisCluster: 'dev-gcp',
-    ingressClass: 'nais-ingress',
-    cdnHost: CDNEnv.prod,
-    cdnBucketPrefix: CDNBucketPrefix.prod
+    ingressClass: 'nais-ingress'
   },
   'intern.dev.nav.no': {
     naisCluster: 'dev-gcp',
-    ingressClass: 'nais-ingress',
-    cdnHost: CDNEnv.prod,
-    cdnBucketPrefix: CDNBucketPrefix.prod
+    ingressClass: 'nais-ingress'
   },
   'ekstern.dev.nav.no': {
     naisCluster: 'dev-gcp',
-    ingressClass: 'nais-ingress-external',
-    cdnHost: CDNEnv.prod,
-    cdnBucketPrefix: CDNBucketPrefix.prod
+    ingressClass: 'nais-ingress-external'
   }
 }
 
@@ -106,13 +82,8 @@ export function parseIngress(ingressHost: string): NaisCluster {
   return hostMap[domainForHost(ingressHost)]
 }
 
-export function cdnPathForApp(
-  team: string,
-  app: string,
-  env: string,
-  bucketPrefix: string
-): string {
-  return `/${bucketPrefix}${team}/${team}/${cdnDestForApp(app, env)}`
+export function cdnPathForApp(team: string, app: string, env: string): string {
+  return `/${team}/${cdnDestForApp(app, env)}`
 }
 
 export function cdnDestForApp(app: string, env: string): string {
@@ -196,27 +167,21 @@ export function spaSetupTask(
   urls: string[],
   env = ''
 ): {
-  cdnHost: string
   cdnDest: string
   naisCluster: string
   naisResources: string
 } {
   let naisClusterFinal = ''
-  let cdnHostFinal = ''
-  let cdnBucketPrefixFinal = ''
 
   const ingresses: Ingress[] = []
 
   for (const ingress of urls) {
     const {hostname: ingressHost, pathname: ingressPath} = new URL(ingress)
-    const {naisCluster, ingressClass, cdnHost, cdnBucketPrefix} =
-      parseIngress(ingressHost)
+    const {naisCluster, ingressClass} = parseIngress(ingressHost)
 
     ingresses.push({ingressHost, ingressPath, ingressClass})
 
     naisClusterFinal = naisClusterFinal || naisCluster
-    cdnHostFinal = cdnHostFinal || cdnHost
-    cdnBucketPrefixFinal = cdnBucketPrefixFinal || cdnBucketPrefix
 
     if (naisClusterFinal !== naisCluster) {
       throw Error(
@@ -226,7 +191,7 @@ export function spaSetupTask(
   }
 
   env = env || naisClusterFinal
-  const bucketPath = cdnPathForApp(team, app, env, cdnBucketPrefixFinal)
+  const bucketPath = cdnPathForApp(team, app, env)
   const cdnDest = cdnDestForApp(app, env)
   const naisResources = naisResourcesForApp(
     team,
@@ -238,7 +203,6 @@ export function spaSetupTask(
   )
 
   return {
-    cdnHost: cdnHostFinal,
     cdnDest,
     naisCluster: naisClusterFinal,
     naisResources

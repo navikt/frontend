@@ -25,10 +25,6 @@ outputs:
     description: 'NAIS resource files'
   nais-vars:
     description: 'NAIS variables'
-  cdn-environment:
-    description: 'CDN environment name'
-  cdn-team-name:
-    description: 'CDN team name'
   cdn-destination:
     description: 'CDN destination'
 

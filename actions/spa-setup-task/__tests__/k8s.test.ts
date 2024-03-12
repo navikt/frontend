@@ -1,7 +1,5 @@
 import * as k8s from '../src/k8s'
 import {expect, test} from '@jest/globals'
-import exp from 'constants'
-import {SpawnOptions} from 'child_process'
 import {Ingress} from '../src/spa'
 
 test('trimRight', () => {
@@ -21,6 +19,7 @@ test('ingressAnnotations()', () => {
   expect(annotations['nginx.ingress.kubernetes.io/upstream-vhost']).toBe(
     bucketVhost
   )
+  expect(annotations['nginx.ingress.kubernetes.io/backend-protocol']).toBe('https')
   Object.keys(annotations || {}).forEach(key => {
     expect(key.startsWith('nginx.ingress.kubernetes.io')).toBe(true)
   })

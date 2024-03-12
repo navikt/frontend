@@ -12,6 +12,7 @@ export function ingressAnnotations(
     'nginx.ingress.kubernetes.io/from-to-www-redirect': 'true',
     'nginx.ingress.kubernetes.io/use-regex': 'true',
     'nginx.ingress.kubernetes.io/server-snippet': `proxy_intercept_errors on;
+    'nginx.ingress.kubernetes.io/backend-protocol': 'https'
 error_page 404 = /index.html;`,
     'nginx.ingress.kubernetes.io/configuration-snippet': `more_set_headers "Cache-Control: public,max-age=0"
 rewrite ^(.*)/$ ${bucketPath}/index.html break;
@@ -36,9 +37,9 @@ export function serviceForApp(
     ports: [
       {
         name: 'http',
-        port: 80,
+        port: 443,
         protocol: 'TCP',
-        targetPort: 80
+        targetPort: 443
       }
     ]
   }
@@ -160,7 +161,7 @@ export function ingressForApp(
                 service: {
                   name: serviceName,
                   port: {
-                    number: 80
+                    number: 443
                   }
                 }
               }

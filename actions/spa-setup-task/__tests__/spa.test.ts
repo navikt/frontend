@@ -60,9 +60,7 @@ test('parseIngress()', () => {
 })
 
 test('cdnPathForApp()', () => {
-  expect(spa.cdnPathForApp('myteam', 'myapp', 'dev')).toBe(
-    '/myteam/myapp/dev'
-  )
+  expect(spa.cdnPathForApp('myteam', 'myapp', 'dev')).toBe('/myteam/myapp/dev')
 })
 
 afterAll(() => {

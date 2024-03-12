@@ -45,7 +45,7 @@ runs:
       name: Upload SPA to CDN
       uses: nais/deploy/actions/cdn-upload/v2@master
       with:
-        team: ${{ inputs.team-name }}
+        team: ${{ inputs.team }}
         source: ${{ inputs.source }}
         source_keep_parent_name: false
         destination: ${{ steps.setup.outputs.cdn-destination }}
@@ -59,4 +59,4 @@ runs:
         CLUSTER: ${{ steps.setup.outputs.nais-cluster }}
         RESOURCE: ${{ steps.setup.outputs.nais-resource }}
         VAR: ${{ steps.setup.outputs.nais-var }}
-        TEAM: ${{ inputs.team-name }}
+        TEAM: ${{ inputs.team }}

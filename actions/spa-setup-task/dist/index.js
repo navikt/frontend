@@ -2701,6 +2701,7 @@ function ingressAnnotations(bucketPath, bucketVhost) {
         'nginx.ingress.kubernetes.io/upstream-vhost': bucketVhost,
         'nginx.ingress.kubernetes.io/from-to-www-redirect': 'true',
         'nginx.ingress.kubernetes.io/use-regex': 'true',
+        'nginx.ingress.kubernetes.io/backend-protocol': 'https',
         'nginx.ingress.kubernetes.io/server-snippet': `proxy_intercept_errors on;
 error_page 404 = /index.html;`,
         'nginx.ingress.kubernetes.io/configuration-snippet': `more_set_headers "Cache-Control: public,max-age=0"
@@ -2721,9 +2722,9 @@ function serviceForApp(team, app, env, bucketVhost) {
         ports: [
             {
                 name: 'http',
-                port: 80,
+                port: 443,
                 protocol: 'TCP',
-                targetPort: 80
+                targetPort: 443
             }
         ]
     };
@@ -2797,7 +2798,7 @@ function ingressForApp(team, app, env, ingressHosts, ingressClass, bucketPath, b
                                 service: {
                                     name: serviceName,
                                     port: {
-                                        number: 80
+                                        number: 443
                                     }
                                 }
                             }
@@ -2870,10 +2871,8 @@ function run() {
         core.setFailed(err.message);
         return;
     }
-    const { cdnHost, cdnDest, naisCluster, naisResources } = (0, spa_1.spaSetupTask)(teamName, appName, ingresses, environment);
-    core.setOutput('cdn-environment', cdnHost);
+    const { cdnDest, naisCluster, naisResources } = (0, spa_1.spaSetupTask)(teamName, appName, ingresses, environment);
     core.setOutput('cdn-destination', cdnDest);
-    core.setOutput('cdn-team-name', teamName);
     core.setOutput('nais-cluster', naisCluster);
     core.setOutput('nais-resource', naisResources);
     core.setOutput('nais-vars', '');
@@ -2896,53 +2895,31 @@ exports.spaSetupTask = exports.validateInputs = exports.naisResourcesForApp = ex
 const yaml_1 = __importDefault(__nccwpck_require__(4083));
 const fs_1 = __nccwpck_require__(7147);
 const k8s_1 = __nccwpck_require__(130);
-var CDNEnv;
-(function (CDNEnv) {
-    CDNEnv["prod"] = "cdn.nav.no";
-    CDNEnv["dev"] = "cdn.dev.nav.no";
-})(CDNEnv || (CDNEnv = {}));
-var CDNBucketPrefix;
-(function (CDNBucketPrefix) {
-    CDNBucketPrefix["prod"] = "frontend-plattform-prod-";
-    CDNBucketPrefix["dev"] = "frontend-plattform-dev-";
-})(CDNBucketPrefix || (CDNBucketPrefix = {}));
-const defaultBucketVhost = 'storage.googleapis.com';
+const defaultBucketVhost = 'cdn.nav.no';
 const hostMap = {
     'nav.no': {
         naisCluster: 'prod-gcp',
-        ingressClass: 'nais-ingress-external',
-        cdnHost: CDNEnv.prod,
-        cdnBucketPrefix: CDNBucketPrefix.prod
+        ingressClass: 'nais-ingress-external'
     },
     'intern.nav.no': {
         naisCluster: 'prod-gcp',
-        ingressClass: 'nais-ingress',
-        cdnHost: CDNEnv.prod,
-        cdnBucketPrefix: CDNBucketPrefix.prod
+        ingressClass: 'nais-ingress'
     },
     'dev.nav.no': {
         naisCluster: 'dev-gcp',
-        ingressClass: 'nais-ingress-external',
-        cdnHost: CDNEnv.prod,
-        cdnBucketPrefix: CDNBucketPrefix.prod
+        ingressClass: 'nais-ingress-external'
     },
     'dev.intern.nav.no': {
         naisCluster: 'dev-gcp',
-        ingressClass: 'nais-ingress',
-        cdnHost: CDNEnv.prod,
-        cdnBucketPrefix: CDNBucketPrefix.prod
+        ingressClass: 'nais-ingress'
     },
     'intern.dev.nav.no': {
         naisCluster: 'dev-gcp',
-        ingressClass: 'nais-ingress',
-        cdnHost: CDNEnv.prod,
-        cdnBucketPrefix: CDNBucketPrefix.prod
+        ingressClass: 'nais-ingress'
     },
     'ekstern.dev.nav.no': {
         naisCluster: 'dev-gcp',
-        ingressClass: 'nais-ingress-external',
-        cdnHost: CDNEnv.prod,
-        cdnBucketPrefix: CDNBucketPrefix.prod
+        ingressClass: 'nais-ingress-external'
     }
 };
 function splitFirst(s, sep) {
@@ -2980,8 +2957,8 @@ function parseIngress(ingressHost) {
     return hostMap[domainForHost(ingressHost)];
 }
 exports.parseIngress = parseIngress;
-function cdnPathForApp(team, app, env, bucketPrefix) {
-    return `/${bucketPrefix}${team}/${team}/${cdnDestForApp(app, env)}`;
+function cdnPathForApp(team, app, env) {
+    return `/${team}/${cdnDestForApp(app, env)}`;
 }
 exports.cdnPathForApp = cdnPathForApp;
 function cdnDestForApp(app, env) {
@@ -3025,26 +3002,21 @@ function validateInputs(team, app, ingress, environment) {
 exports.validateInputs = validateInputs;
 function spaSetupTask(team, app, urls, env = '') {
     let naisClusterFinal = '';
-    let cdnHostFinal = '';
-    let cdnBucketPrefixFinal = '';
     const ingresses = [];
     for (const ingress of urls) {
         const { hostname: ingressHost, pathname: ingressPath } = new URL(ingress);
-        const { naisCluster, ingressClass, cdnHost, cdnBucketPrefix } = parseIngress(ingressHost);
+        const { naisCluster, ingressClass } = parseIngress(ingressHost);
         ingresses.push({ ingressHost, ingressPath, ingressClass });
         naisClusterFinal = naisClusterFinal || naisCluster;
-        cdnHostFinal = cdnHostFinal || cdnHost;
-        cdnBucketPrefixFinal = cdnBucketPrefixFinal || cdnBucketPrefix;
         if (naisClusterFinal !== naisCluster) {
             throw Error(`Ingresses must be on same cluster. Found ${naisClusterFinal} and ${naisCluster}`);
         }
     }
     env = env || naisClusterFinal;
-    const bucketPath = cdnPathForApp(team, app, env, cdnBucketPrefixFinal);
+    const bucketPath = cdnPathForApp(team, app, env);
     const cdnDest = cdnDestForApp(app, env);
     const naisResources = naisResourcesForApp(team, app, env, ingresses, bucketPath, defaultBucketVhost);
     return {
-        cdnHost: cdnHostFinal,
         cdnDest,
         naisCluster: naisClusterFinal,
         naisResources

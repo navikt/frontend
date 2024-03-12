@@ -1,7 +1,5 @@
 import * as k8s from '../src/k8s'
 import {expect, test} from '@jest/globals'
-import exp from 'constants'
-import {SpawnOptions} from 'child_process'
 import {Ingress} from '../src/spa'
 
 test('trimRight', () => {
@@ -13,13 +11,16 @@ test('trimRight', () => {
 
 test('ingressAnnotations()', () => {
   const bucketPath = 'foo/bar/baz'
-  const bucketVhost = 'storage.googleapis.com'
+  const bucketVhost = 'cdn.nav.no'
 
   const annotations = k8s.ingressAnnotations(bucketPath, bucketVhost) || {}
 
-  expect(Object.keys(annotations || {}).length).toBe(5)
+  expect(Object.keys(annotations || {}).length).toBe(6)
   expect(annotations['nginx.ingress.kubernetes.io/upstream-vhost']).toBe(
     bucketVhost
+  )
+  expect(annotations['nginx.ingress.kubernetes.io/backend-protocol']).toBe(
+    'https'
   )
   Object.keys(annotations || {}).forEach(key => {
     expect(key.startsWith('nginx.ingress.kubernetes.io')).toBe(true)
@@ -30,7 +31,7 @@ test('serviceForApp()', () => {
   const team = 'myteam'
   const app = 'myapp'
   const env = 'myenv'
-  const bucketVhost = 'storage.googleapis.com'
+  const bucketVhost = 'cdn.nav.no'
 
   const service = k8s.serviceForApp(team, app, env, bucketVhost)
 
@@ -111,7 +112,7 @@ test('ingressForApp()', () => {
   }
   const ingressClass = 'gw-foobar'
   const bucketPath = 'foo/bar/baz'
-  const bucketVhost = 'storage.googleapis.com'
+  const bucketVhost = 'cdn.nav.no'
 
   const ingress = k8s.ingressForApp(
     team,

@@ -14,16 +14,14 @@ function run(): void {
     return
   }
 
-  const {cdnHost, cdnDest, naisCluster, naisResources} = spaSetupTask(
+  const {cdnDest, naisCluster, naisResources} = spaSetupTask(
     teamName,
     appName,
     ingresses,
     environment
   )
 
-  core.setOutput('cdn-environment', cdnHost)
   core.setOutput('cdn-destination', cdnDest)
-  core.setOutput('cdn-team-name', teamName)
   core.setOutput('nais-cluster', naisCluster)
   core.setOutput('nais-resource', naisResources)
   core.setOutput('nais-vars', '')

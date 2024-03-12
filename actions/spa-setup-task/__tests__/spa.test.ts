@@ -60,9 +60,7 @@ test('parseIngress()', () => {
 })
 
 test('cdnPathForApp()', () => {
-  expect(spa.cdnPathForApp('myteam', 'myapp', 'dev', 'bucket-prefix-')).toBe(
-    '/bucket-prefix-myteam/myteam/myapp/dev'
-  )
+  expect(spa.cdnPathForApp('myteam', 'myapp', 'dev')).toBe('/myteam/myapp/dev')
 })
 
 afterAll(() => {
@@ -92,7 +90,7 @@ test('naisResourcesForApp()', () => {
         }
       ],
       'bucket/path',
-      'storage.googleapis.com',
+      'cdn.nav.no',
       tmpDir
     )
     .split(',')
@@ -108,6 +106,7 @@ test('naisResourcesForApp()', () => {
 
   expect(ingressYaml.kind).toEqual('Ingress')
   expect(serviceYaml.kind).toEqual('Service')
+  expect(serviceYaml.spec.externalName).toEqual('cdn.nav.no')
 
   expect(ingressYaml.metadata.name).toEqual('myapp-myenv-gw-foobar')
   expect(ingressYaml.spec.rules.length).toEqual(1)

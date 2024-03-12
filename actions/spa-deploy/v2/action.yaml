@@ -1,10 +1,10 @@
 name: 'SPA Deploy Action'
 description: 'Upload Single Page Application (SPA) to CDN and deploy to NAIS'
 inputs:
-  team-name:
+  team:
     description: 'Team name'
     required: true
-  app-name:
+  app:
     description: 'Application name'
     required: true
   source:
@@ -16,10 +16,12 @@ inputs:
   ingress:
     description: 'Application ingress URL'
     required: true
-  nais-deploy-apikey:
-    description: 'NAIS deploy API key'
-    required: false
-    default: ""
+  project_id:
+    description: "Google Cloud project ID where buckets are hosted"
+    required: true
+  identity_provider:
+    description: "Google Workload Identity Provider"
+    required: true
 
 outputs:
   url:
@@ -31,30 +33,30 @@ runs:
   steps:
     - id: setup
       name: Setup for SPA deploy
-      uses: navikt/frontend/actions/spa-setup-task@b3fa2be
+      uses: navikt/frontend/actions/spa-setup-task@main
       with:
-        team-name: ${{ inputs.team-name }}
-        app-name: ${{ inputs.app-name }}
+        team-name: ${{ inputs.team }}
+        app-name: ${{ inputs.app }}
         ingress: ${{ inputs.ingress }}
         source: ${{ inputs.source }}
         environment: ${{ inputs.environment }}
 
     - id: cdn-upload
       name: Upload SPA to CDN
-      uses: navikt/frontend/actions/cdn-upload/v1@main
+      uses: nais/deploy/actions/cdn-upload/v2@master
       with:
-        cdn-environment: ${{ steps.setup.outputs.cdn-environment }}
-        cdn-team-name: ${{ inputs.team-name }}
+        team: ${{ inputs.team }}
         source: ${{ inputs.source }}
-        source-keep-parent-name: false
+        source_keep_parent_name: false
         destination: ${{ steps.setup.outputs.cdn-destination }}
+        project_id: ${{ inputs.project_id }}
+        identity_provider: ${{ inputs.identity_provider }}
 
     - id: nais-deploy
       name: Deploy SPA to NAIS
       uses: nais/deploy/actions/deploy@v2
       env:
-        APIKEY: ${{ inputs.nais-deploy-apikey }}
         CLUSTER: ${{ steps.setup.outputs.nais-cluster }}
         RESOURCE: ${{ steps.setup.outputs.nais-resource }}
         VAR: ${{ steps.setup.outputs.nais-var }}
-        TEAM: ${{ inputs.team-name }}
+        TEAM: ${{ inputs.team }}

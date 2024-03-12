@@ -15,11 +15,13 @@ test('ingressAnnotations()', () => {
 
   const annotations = k8s.ingressAnnotations(bucketPath, bucketVhost) || {}
 
-  expect(Object.keys(annotations || {}).length).toBe(5)
+  expect(Object.keys(annotations || {}).length).toBe(6)
   expect(annotations['nginx.ingress.kubernetes.io/upstream-vhost']).toBe(
     bucketVhost
   )
-  expect(annotations['nginx.ingress.kubernetes.io/backend-protocol']).toBe('https')
+  expect(annotations['nginx.ingress.kubernetes.io/backend-protocol']).toBe(
+    'https'
+  )
   Object.keys(annotations || {}).forEach(key => {
     expect(key.startsWith('nginx.ingress.kubernetes.io')).toBe(true)
   })

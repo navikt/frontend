@@ -2701,6 +2701,7 @@ function ingressAnnotations(bucketPath, bucketVhost) {
         'nginx.ingress.kubernetes.io/upstream-vhost': bucketVhost,
         'nginx.ingress.kubernetes.io/from-to-www-redirect': 'true',
         'nginx.ingress.kubernetes.io/use-regex': 'true',
+        'nginx.ingress.kubernetes.io/backend-protocol': 'https',
         'nginx.ingress.kubernetes.io/server-snippet': `proxy_intercept_errors on;
 error_page 404 = /index.html;`,
         'nginx.ingress.kubernetes.io/configuration-snippet': `more_set_headers "Cache-Control: public,max-age=0"
@@ -2721,9 +2722,9 @@ function serviceForApp(team, app, env, bucketVhost) {
         ports: [
             {
                 name: 'http',
-                port: 80,
+                port: 443,
                 protocol: 'TCP',
-                targetPort: 80
+                targetPort: 443
             }
         ]
     };
@@ -2797,7 +2798,7 @@ function ingressForApp(team, app, env, ingressHosts, ingressClass, bucketPath, b
                                 service: {
                                     name: serviceName,
                                     port: {
-                                        number: 80
+                                        number: 443
                                     }
                                 }
                             }

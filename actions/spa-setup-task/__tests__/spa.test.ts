@@ -90,7 +90,7 @@ test('naisResourcesForApp()', () => {
         }
       ],
       'bucket/path',
-      'cdn.nav.no',
+      'cdn.nav.cloud.nais.io',
       tmpDir
     )
     .split(',')
@@ -106,7 +106,7 @@ test('naisResourcesForApp()', () => {
 
   expect(ingressYaml.kind).toEqual('Ingress')
   expect(serviceYaml.kind).toEqual('Service')
-  expect(serviceYaml.spec.externalName).toEqual('cdn.nav.no')
+  expect(serviceYaml.spec.externalName).toEqual('cdn.nav.cloud.nais.io')
 
   expect(ingressYaml.metadata.name).toEqual('myapp-myenv-gw-foobar')
   expect(ingressYaml.spec.rules.length).toEqual(1)

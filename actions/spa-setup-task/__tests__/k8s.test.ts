@@ -11,7 +11,7 @@ test('trimRight', () => {
 
 test('ingressAnnotations()', () => {
   const bucketPath = 'foo/bar/baz'
-  const bucketVhost = 'cdn.nav.no'
+  const bucketVhost = 'cdn.nav.cloud.nais.io'
 
   const annotations = k8s.ingressAnnotations(bucketPath, bucketVhost) || {}
 
@@ -31,7 +31,7 @@ test('serviceForApp()', () => {
   const team = 'myteam'
   const app = 'myapp'
   const env = 'myenv'
-  const bucketVhost = 'cdn.nav.no'
+  const bucketVhost = 'cdn.nav.cloud.nais.io'
 
   const service = k8s.serviceForApp(team, app, env, bucketVhost)
 
@@ -112,7 +112,7 @@ test('ingressForApp()', () => {
   }
   const ingressClass = 'gw-foobar'
   const bucketPath = 'foo/bar/baz'
-  const bucketVhost = 'cdn.nav.no'
+  const bucketVhost = 'cdn.nav.cloud.nais.io'
 
   const ingress = k8s.ingressForApp(
     team,

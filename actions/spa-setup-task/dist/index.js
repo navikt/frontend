@@ -2895,7 +2895,7 @@ exports.spaSetupTask = exports.validateInputs = exports.naisResourcesForApp = ex
 const yaml_1 = __importDefault(__nccwpck_require__(4083));
 const fs_1 = __nccwpck_require__(7147);
 const k8s_1 = __nccwpck_require__(130);
-const defaultBucketVhost = 'cdn.nav.no';
+const defaultBucketVhost = 'cdn.nav.cloud.nais.io';
 const hostMap = {
     'nav.no': {
         naisCluster: 'prod-gcp',

@@ -12,7 +12,7 @@ export type Ingress = {
   ingressClass: string
 }
 
-const defaultBucketVhost = 'cdn.nav.no'
+const defaultBucketVhost = 'cdn.nav.cloud.nais.io'
 
 type NaisCluster = {
   naisCluster: string

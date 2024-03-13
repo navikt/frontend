@@ -34,5 +34,7 @@ runs:
       run: |
         echo "::error ::spa-deploy/v1 has been removed."
         echo "Please upgrade to spa-deploy/v2." >> $GITHUB_STEP_SUMMARY
-        echo "Example patch: https://github.com/navikt/frontend-golden-path/compare/242b9cd52fa9edb5c9b76acd13eb0e5f5f8740b0...474055584c1abdcb271133f9cab283eaa7b0ebe6" >> $GITHUB_STEP_SUMMARY
+        echo "Slack thread: https://nav-it.slack.com/archives/C01DE3M9YBV/p1710329765663829" >> $GITHUB_STEP_SUMMARY
+        echo "Documentation: https://doc.nais.io/explanation/cdn/" >> $GITHUB_STEP_SUMMARY
+        echo "Example: https://github.com/navikt/eldrebolgen/compare/d7223248472ee849e63d1a28dfe4c459d27a1058..3d963519ba1228c3b19fdf82fe99bf30e03e24fb" >> $GITHUB_STEP_SUMMARY
         exit 1

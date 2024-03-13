@@ -25,7 +25,7 @@ jobs:
         working-directory: react/cdn
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: 18.x
@@ -33,12 +33,13 @@ jobs:
       - run: npm run lint
       - run: npm run build
 
-      - uses: ./actions/spa-deploy/v1
+      - uses: ./actions/spa-deploy/v2
         # if: github.ref == 'refs/heads/main'
         with:
-          app-name: fp-react-cdn
-          team-name: frontendplattform
+          app: fp-react-cdn
+          team: frontendplattform
           environment: labs
           ingress: https://fp-react-cdn.labs.nais.io/,https://fp-react-cdn.labs.nais.io/foo
           source: react/cdn/build
-          nais-deploy-apikey: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}

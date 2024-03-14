@@ -4,8 +4,8 @@ En GitHub Action som publiserer en Single Page Application (SPA) til NAV CDN og 
 
 ## Forutsetninger
 
-* Teamet må være registrert i NAV (se [nais/teams](https://github.com/nais/teams)) med NAIS Deploy Key (se [nais/deploy](https://deploy.nais.io))
-* Teamet må være registrert i NAV CDN (se [nais/frontend-plattform](https://github.com/nais/frontend-plattform)) med tilgang til repoet
+* Teamet må være registrert i [NAIS Console](https://console.nav.cloud.nais.io)
+* Repository må autoriseres for deploy i Console
 * Applikasjonen må bygges og pakkes som en mappe som inneholder en `index.html` fil og alle andre statiske filer.
 
 ## Begrensninger
@@ -33,37 +33,39 @@ jobs:
       id-token: 'write'
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
       - run: npm ci
       - run: npm run build
-      - uses: navikt/frontend/actions/spa-deploy/v1@main
+      - uses: navikt/frontend/actions/spa-deploy/v2@main
         with:
-          app-name: min-frontend
-          team-name: mitt-team
+          app: min-frontend
+          team: mitt-team
           source: ./build
           ingress: https://team.nav.no/min-frontend
           environment: dev
-          nais-deploy-apikey: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
 ```
 
 ## Input parametere
 
 | Navn | Beskrivelse | Påkrevd | Default |
 | ---- | ----------- | -------- | ------- |
-| `app-name` | Applikasjonsnavn | Yes | |
-| `team-name` | Teamnavn | Yes | |
-| `source` | Mappe med kompilert kildekode | Yes | |
-| `environment` | Miljø (kan være hvilken som helst streng) | Yes | |
-| `ingress` | Adresse applikasjonen skal være tilgjenglig på | Yes | |
-| `nais-deploy-apikey` | NAIS Deploy ApiKey | Yes | |
+| `app` | Applikasjonsnavn | Ja | |
+| `team` | Teamnavn | Ja | |
+| `source` | Mappe med kompilert kildekode | Ja | |
+| `environment` | Miljø (kan være hvilken som helst streng) | Ja | |
+| `ingress` | Adresse applikasjonen skal være tilgjenglig på | Ja | |
+| `project_id` | Må settes til `${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}` | Ja | |
+| `identity_provider` | Må settes til `${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}` | Ja | |
 
 Statiske filer vil bli lastet opp til følgende adresse i NAV CDN:
 
 ```text
-https://cdn.nav.no/<team-name>/<app-name>/<env>/
+https://cdn.nav.no/<team>/<app>/<env>/
 ```
 
 ### Flere ingresser
@@ -71,7 +73,7 @@ https://cdn.nav.no/<team-name>/<app-name>/<env>/
 For å få applikasjonen tilgjengelig over flere ingresser kan du sette `ingress` til en kommaseparert liste av ingresser:
 
 ```yaml
-      - uses: navikt/frontend/actions/spa-deploy/v1@main
+      - uses: navikt/frontend/actions/spa-deploy/v2@main
         with:
           ...
           ingress: https://team.nav.no/min-frontend,https://team.nav.no/andre-ingress
@@ -86,7 +88,7 @@ For å få riktige lenker til statiske filer på CDN i en Create React App må d
 1. `.env` fil:
 
 ```text
-PUBLIC_URL=https://cdn.nav.no/<team-name>/<app-name>/<env>/
+PUBLIC_URL=https://cdn.nav.no/<team>/<app>/<env>/
 ```
 
 2. `env` i GitHub Actions når du bygger applikasjonen:
@@ -95,11 +97,11 @@ PUBLIC_URL=https://cdn.nav.no/<team-name>/<app-name>/<env>/
     steps:
       - run: npm run build
         env:
-          PUBLIC_URL: https://cdn.nav.no/<team-name>/<app-name>/<env>
-      - uses: navikt/frontend/actions/spa-deploy/v1@main
+          PUBLIC_URL: https://cdn.nav.no/<team>/<app>/<env>
+      - uses: navikt/frontend/actions/spa-deploy/v2@main
         with:
-          app-name: <app-name>
-          team-name: <team-name>
+          app: <app>
+          team: <team>
           environment: <env>
 ```
 
@@ -115,7 +117,7 @@ const isProd = process.env.NODE_ENV === 'production'
 
 module.exports = {
   // Use the CDN in production and localhost for development.
-  assetPrefix: isProd ? 'https://cdn.nav.no/<team-name>/<app-name>/<env>' : undefined,
+  assetPrefix: isProd ? 'https://cdn.nav.no/<team>/<app>/<env>' : undefined,
 }
 ```
 

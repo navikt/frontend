@@ -38,7 +38,7 @@ outputs:
 runs:
   using: "composite"
   steps:
-	  - name: "cdn-upload/v1 removal notice"
+    - name: "cdn-upload/v1 removal notice"
       shell: bash
       run: |
         echo "::error ::cdn-upload/v1 has been removed."

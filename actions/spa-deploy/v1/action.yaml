@@ -29,7 +29,7 @@ outputs:
 runs:
   using: "composite"
   steps:
-	  - name: "spa-deploy/v1 removal notice"
+    - name: "spa-deploy/v1 removal notice"
       shell: bash
       run: |
         echo "::error ::spa-deploy/v1 has been removed."

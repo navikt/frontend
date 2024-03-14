@@ -29,32 +29,12 @@ outputs:
 runs:
   using: "composite"
   steps:
-    - id: setup
-      name: Setup for SPA deploy
-      uses: navikt/frontend/actions/spa-setup-task@b3fa2be747998289039a8b4ed8514b608cf08410
-      with:
-        team-name: ${{ inputs.team-name }}
-        app-name: ${{ inputs.app-name }}
-        ingress: ${{ inputs.ingress }}
-        source: ${{ inputs.source }}
-        environment: ${{ inputs.environment }}
-
-    - id: cdn-upload
-      name: Upload SPA to CDN
-      uses: navikt/frontend/actions/cdn-upload/v1@main
-      with:
-        cdn-environment: ${{ steps.setup.outputs.cdn-environment }}
-        cdn-team-name: ${{ inputs.team-name }}
-        source: ${{ inputs.source }}
-        source-keep-parent-name: false
-        destination: ${{ steps.setup.outputs.cdn-destination }}
-
-    - id: nais-deploy
-      name: Deploy SPA to NAIS
-      uses: nais/deploy/actions/deploy@v2
-      env:
-        APIKEY: ${{ inputs.nais-deploy-apikey }}
-        CLUSTER: ${{ steps.setup.outputs.nais-cluster }}
-        RESOURCE: ${{ steps.setup.outputs.nais-resource }}
-        VAR: ${{ steps.setup.outputs.nais-var }}
-        TEAM: ${{ inputs.team-name }}
+    - name: "spa-deploy/v1 removal notice"
+      shell: bash
+      run: |
+        echo "::error ::spa-deploy/v1 has been removed."
+        echo "Please upgrade to spa-deploy/v2." >> $GITHUB_STEP_SUMMARY
+        echo "Slack thread: https://nav-it.slack.com/archives/C01DE3M9YBV/p1710329765663829" >> $GITHUB_STEP_SUMMARY
+        echo "Documentation: https://doc.nais.io/explanation/cdn/" >> $GITHUB_STEP_SUMMARY
+        echo "Example: https://github.com/navikt/eldrebolgen/compare/d7223248472ee849e63d1a28dfe4c459d27a1058..3d963519ba1228c3b19fdf82fe99bf30e03e24fb" >> $GITHUB_STEP_SUMMARY
+        exit 1

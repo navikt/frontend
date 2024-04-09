@@ -2905,6 +2905,10 @@ const hostMap = {
         naisCluster: 'prod-gcp',
         ingressClass: 'nais-ingress'
     },
+    'ansatt.nav.no': {
+        naisCluster: 'prod-gcp',
+        ingressClass: 'nais-ingress-fa'
+    },
     'dev.nav.no': {
         naisCluster: 'dev-gcp',
         ingressClass: 'nais-ingress-external'
@@ -2916,6 +2920,10 @@ const hostMap = {
     'intern.dev.nav.no': {
         naisCluster: 'dev-gcp',
         ingressClass: 'nais-ingress'
+    },
+    'ansatt.dev.nav.no': {
+        naisCluster: 'dev-gcp',
+        ingressClass: 'nais-ingress-fa'
     },
     'ekstern.dev.nav.no': {
         naisCluster: 'dev-gcp',

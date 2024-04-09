@@ -40,13 +40,13 @@ const hostMap: Clusters = {
     naisCluster: 'dev-gcp',
     ingressClass: 'nais-ingress'
   },
-  'dev.ansatt.nav.no': {
-    naisCluster: 'dev-gcp',
-    ingressClass: 'nais-ingress-fa'
-  },
   'intern.dev.nav.no': {
     naisCluster: 'dev-gcp',
     ingressClass: 'nais-ingress'
+  },
+  'ansatt.dev.nav.no': {
+    naisCluster: 'dev-gcp',
+    ingressClass: 'nais-ingress-fa'
   },
   'ekstern.dev.nav.no': {
     naisCluster: 'dev-gcp',

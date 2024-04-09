@@ -2704,7 +2704,7 @@ function ingressAnnotations(bucketPath, bucketVhost) {
         'nginx.ingress.kubernetes.io/backend-protocol': 'https',
         'nginx.ingress.kubernetes.io/server-snippet': `proxy_intercept_errors on;
 error_page 404 = /index.html;`,
-        'nginx.ingress.kubernetes.io/configuration-snippet': `more_set_headers "Cache-Control: public,max-age=0"
+        'nginx.ingress.kubernetes.io/configuration-snippet': `more_set_headers "Cache-Control: public,max-age=0";
 rewrite ^(.*)/$ ${bucketPath}/index.html break;
 rewrite ^/(.*)$ ${bucketPath}/$1 break;`
     };

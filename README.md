@@ -15,7 +15,7 @@
 
 - [Skrive seg bort fra LESS.js](https://aksel.nav.no/blogg/bli-kvitt-less-pa-1-2-3)
 - [Publisere og bruke pakker fra Github Package Registry](https://github.com/navikt/gpr-how-to)
-- [Patterns.dev](https://www.patterns.dev/posts/): Design og component-patterns for React og web-utvikling generelt.
+- [Patterns.dev](https://www.patterns.dev/): Design og component-patterns for React og web-utvikling generelt.
 
 ### Kurs
 

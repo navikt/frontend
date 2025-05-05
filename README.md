@@ -1,3 +1,6 @@
+Dette repoet er nå deprecated til fordel for doc på aksel.nav.no og noe på docs.nais.io. Om du lurer på noe mer kan du gjerne sende en melding til meg, Andreas Nordahl.
+
+
 <h1 align="center">
     <img src="https://avatars.githubusercontent.com/u/11848947?s=164&v=4" />
     <br/>Frontend
